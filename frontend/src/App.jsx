@@ -1,71 +1,118 @@
-import { useState } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import GuestOnlyRoute from "./components/auth/GuestOnlyRoute";
+import RequireAuth from "./components/auth/RequireAuth";
+import MainLayout from "./layouts/dashboard/MainLayout";
+import AuthLayout from "./layouts/login/AuthLayout";
 import Dashboard from "./pages/Dashboard";
+import Documents from "./pages/Documents";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import Schedule from "./pages/Schedule";
+import Statistics from "./pages/Statistics";
 import Subjects from "./pages/Subjects";
 import Tasks from "./pages/Tasks";
-import Schedule from "./pages/Schedule";
-import Documents from "./pages/Documents";
-import Statistics from "./pages/Statistics";
+import { getSessionUser } from "./lib/auth";
 
-const pages = {
-  dashboard: Dashboard,
-  subjects: Subjects,
-  tasks: Tasks,
-  schedule: Schedule,
-  documents: Documents,
-  statistics: Statistics,
-  login: Login,
-  register: Register,
-};
-
-const navItems = [
-  { id: "dashboard", label: "Dashboard" },
-  { id: "subjects", label: "Môn học" },
-  { id: "tasks", label: "Deadline" },
-  { id: "schedule", label: "Lịch học" },
-  { id: "documents", label: "Tài liệu" },
-  { id: "statistics", label: "Thống kê" },
-  { id: "login", label: "Đăng nhập" },
-  { id: "register", label: "Đăng ký" },
-];
+function HomeRedirect() {
+  return getSessionUser() ? (
+    <Navigate to="/dashboard" replace />
+  ) : (
+    <Navigate to="/login" replace />
+  );
+}
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("dashboard");
-  const Page = pages[currentPage];
-
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      <aside style={{ width: "220px", padding: "20px", background: "#f1f1f1" }}>
-        <h2>Study Manager</h2>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomeRedirect />} />
 
-        <nav style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setCurrentPage(item.id)}
-              style={{
-                border: "none",
-                background: item.id === currentPage ? "#d9e8ff" : "transparent",
-                color: "#1f2937",
-                textAlign: "left",
-                padding: "8px 10px",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
-      </aside>
+        <Route
+          path="/login"
+          element={
+            <GuestOnlyRoute>
+              <AuthLayout>
+                <Login />
+              </AuthLayout>
+            </GuestOnlyRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <GuestOnlyRoute>
+              <AuthLayout>
+                <Register />
+              </AuthLayout>
+            </GuestOnlyRoute>
+          }
+        />
 
-      <main style={{ flex: 1, padding: "20px" }}>
-        <Page />
-      </main>
-    </div>
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth>
+              <MainLayout>
+                <Dashboard />
+              </MainLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/subjects"
+          element={
+            <RequireAuth>
+              <MainLayout>
+                <Subjects />
+              </MainLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/tasks"
+          element={
+            <RequireAuth>
+              <MainLayout>
+                <Tasks />
+              </MainLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/schedule"
+          element={
+            <RequireAuth>
+              <MainLayout>
+                <Schedule />
+              </MainLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/documents"
+          element={
+            <RequireAuth>
+              <MainLayout>
+                <Documents />
+              </MainLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/statistics"
+          element={
+            <RequireAuth>
+              <MainLayout>
+                <Statistics />
+              </MainLayout>
+            </RequireAuth>
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
