@@ -2,9 +2,9 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import GuestOnlyRoute from "./components/auth/GuestOnlyRoute";
 import RequireAuth from "./components/auth/RequireAuth";
-import MainLayout from "./layouts/dashboard/MainLayout";
 import AuthLayout from "./layouts/login/AuthLayout";
-import Dashboard from "./pages/Dashboard";
+import MainLayout from "./layouts/MainLayout";
+import Dashboard from "./pages/dashboard/Dashboard";
 import Documents from "./pages/Documents";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
