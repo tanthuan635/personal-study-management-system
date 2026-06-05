@@ -68,6 +68,22 @@ export const DEFAULT_SCHEDULES = [
   },
 ];
 
+export const DOCUMENTS_STORAGE_KEY = "study-manager-documents";
+
+export const DOCUMENT_TYPE_OPTIONS = ["PDF", "DOCX", "PPTX", "Video", "Link", "Khác"];
+
+export const DEFAULT_DOCUMENTS = [
+  {
+    id: 1,
+    title: "Slide React cơ bản",
+    subjectId: 1,
+    fileName: "react-basic.pdf",
+    type: "PDF",
+    uploadDate: "2026-06-04",
+    description: "Tài liệu học React",
+  },
+];
+
 function canUseLocalStorage() {
   return typeof window !== "undefined" && Boolean(window.localStorage);
 }
@@ -310,4 +326,28 @@ export function sortSchedulesByPeriod(schedules) {
 
     return Number(firstSchedule.endPeriod) - Number(secondSchedule.endPeriod);
   });
+}
+
+function normalizeDocument(documentItem) {
+  return {
+    id: documentItem.id,
+    title: documentItem.title || "",
+    subjectId: Number(documentItem.subjectId) || 1,
+    fileName: documentItem.fileName || "",
+    type: documentItem.type || DOCUMENT_TYPE_OPTIONS[0],
+    uploadDate: documentItem.uploadDate || "",
+    description: documentItem.description || "",
+  };
+}
+
+export function loadDocuments() {
+  return loadItems(DOCUMENTS_STORAGE_KEY, DEFAULT_DOCUMENTS).map(normalizeDocument);
+}
+
+export function saveDocuments(documents) {
+  saveItems(DOCUMENTS_STORAGE_KEY, documents.map(normalizeDocument));
+}
+
+export function getNextDocumentId(documents) {
+  return getNextId(documents);
 }
