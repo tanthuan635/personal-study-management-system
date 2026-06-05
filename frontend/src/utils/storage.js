@@ -11,66 +11,6 @@ export const DEFAULT_SUBJECTS = [
   },
 ];
 
-function canUseLocalStorage() {
-  return typeof window !== "undefined" && Boolean(window.localStorage);
-}
-
-function cloneSubjects(subjects) {
-  return subjects.map((subject) => ({ ...subject }));
-}
-
-function seedSubjects() {
-  if (!canUseLocalStorage()) {
-    return cloneSubjects(DEFAULT_SUBJECTS);
-  }
-
-  window.localStorage.setItem(
-    SUBJECTS_STORAGE_KEY,
-    JSON.stringify(DEFAULT_SUBJECTS),
-  );
-
-  return cloneSubjects(DEFAULT_SUBJECTS);
-}
-
-export function loadSubjects() {
-  if (!canUseLocalStorage()) {
-    return cloneSubjects(DEFAULT_SUBJECTS);
-  }
-
-  const storedValue = window.localStorage.getItem(SUBJECTS_STORAGE_KEY);
-
-  if (!storedValue) {
-    return seedSubjects();
-  }
-
-  try {
-    const parsedValue = JSON.parse(storedValue);
-
-    if (!Array.isArray(parsedValue)) {
-      return seedSubjects();
-    }
-
-    return parsedValue;
-  } catch {
-    return seedSubjects();
-  }
-}
-
-export function saveSubjects(subjects) {
-  if (!canUseLocalStorage()) {
-    return;
-  }
-
-  window.localStorage.setItem(SUBJECTS_STORAGE_KEY, JSON.stringify(subjects));
-}
-
-export function getNextSubjectId(subjects) {
-  return subjects.reduce((maxId, subject) => {
-    const subjectId = Number(subject.id) || 0;
-    return Math.max(maxId, subjectId);
-  }, 0) + 1;
-}
-
 export const TASKS_STORAGE_KEY = "study-manager-tasks";
 
 export const DEFAULT_TASKS = [
@@ -91,57 +31,122 @@ export const TASK_PRIORITY_OPTIONS = ["Thấp", "Trung bình", "Cao"];
 
 export const TASK_WARNING_DAYS = 3;
 
-function cloneTasks(tasks) {
-  return tasks.map((task) => ({ ...task }));
+export const SCHEDULES_STORAGE_KEY = "study-manager-schedules";
+
+export const SCHEDULE_DAY_OPTIONS = [
+  "Thứ 2",
+  "Thứ 3",
+  "Thứ 4",
+  "Thứ 5",
+  "Thứ 6",
+  "Thứ 7",
+  "Chủ nhật",
+];
+
+export const SCHEDULE_PERIOD_OPTIONS = Array.from(
+  { length: 12 },
+  (_, index) => index + 1,
+);
+
+export const SCHEDULE_PERIOD_LENGTH_MINUTES = 45;
+
+export const SCHEDULE_PERIOD_BREAK_MINUTES = 5;
+
+export const SCHEDULE_PERIOD_LONG_BREAK_MINUTES = 15;
+
+export const SCHEDULE_LONG_BREAK_AFTER_PERIODS = [3, 9];
+
+export const DEFAULT_SCHEDULES = [
+  {
+    id: 1,
+    subjectId: 1,
+    dayOfWeek: "Thứ 2",
+    startPeriod: 1,
+    endPeriod: 3,
+    room: "A101",
+    note: "Học lý thuyết",
+  },
+];
+
+function canUseLocalStorage() {
+  return typeof window !== "undefined" && Boolean(window.localStorage);
 }
 
-function seedTasks() {
-  if (!canUseLocalStorage()) {
-    return cloneTasks(DEFAULT_TASKS);
-  }
-
-  window.localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(DEFAULT_TASKS));
-
-  return cloneTasks(DEFAULT_TASKS);
+function cloneItems(items) {
+  return items.map((item) => ({ ...item }));
 }
 
-export function loadTasks() {
+function seedItems(storageKey, defaultItems) {
   if (!canUseLocalStorage()) {
-    return cloneTasks(DEFAULT_TASKS);
+    return cloneItems(defaultItems);
   }
 
-  const storedValue = window.localStorage.getItem(TASKS_STORAGE_KEY);
+  window.localStorage.setItem(storageKey, JSON.stringify(defaultItems));
+
+  return cloneItems(defaultItems);
+}
+
+function loadItems(storageKey, defaultItems) {
+  if (!canUseLocalStorage()) {
+    return cloneItems(defaultItems);
+  }
+
+  const storedValue = window.localStorage.getItem(storageKey);
 
   if (!storedValue) {
-    return seedTasks();
+    return seedItems(storageKey, defaultItems);
   }
 
   try {
     const parsedValue = JSON.parse(storedValue);
 
     if (!Array.isArray(parsedValue)) {
-      return seedTasks();
+      return seedItems(storageKey, defaultItems);
     }
 
     return parsedValue;
   } catch {
-    return seedTasks();
+    return seedItems(storageKey, defaultItems);
   }
 }
 
-export function saveTasks(tasks) {
+function saveItems(storageKey, items) {
   if (!canUseLocalStorage()) {
     return;
   }
 
-  window.localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
+  window.localStorage.setItem(storageKey, JSON.stringify(items));
+}
+
+function getNextId(items) {
+  return items.reduce((maxId, item) => {
+    const itemId = Number(item.id) || 0;
+    return Math.max(maxId, itemId);
+  }, 0) + 1;
+}
+
+export function loadSubjects() {
+  return loadItems(SUBJECTS_STORAGE_KEY, DEFAULT_SUBJECTS);
+}
+
+export function saveSubjects(subjects) {
+  saveItems(SUBJECTS_STORAGE_KEY, subjects);
+}
+
+export function getNextSubjectId(subjects) {
+  return getNextId(subjects);
+}
+
+export function loadTasks() {
+  return loadItems(TASKS_STORAGE_KEY, DEFAULT_TASKS);
+}
+
+export function saveTasks(tasks) {
+  saveItems(TASKS_STORAGE_KEY, tasks);
 }
 
 export function getNextTaskId(tasks) {
-  return tasks.reduce((maxId, task) => {
-    const taskId = Number(task.id) || 0;
-    return Math.max(maxId, taskId);
-  }, 0) + 1;
+  return getNextId(tasks);
 }
 
 function getStartOfDay(dateValue) {
@@ -194,4 +199,115 @@ export function getTaskDeadlineState(task, referenceDate = new Date()) {
     label: `Còn ${diffDays} ngày`,
     daysUntilDue: diffDays,
   };
+}
+
+function getPeriodStartMinute(period) {
+  const periodNumber = Number(period);
+  const sessionStartMinute = periodNumber >= 7 ? 13 * 60 : 7 * 60;
+  const firstPeriodInSession = periodNumber >= 7 ? 7 : 1;
+  let startMinute = sessionStartMinute;
+
+  for (let currentPeriod = firstPeriodInSession; currentPeriod < periodNumber; currentPeriod += 1) {
+    const breakMinutes = SCHEDULE_LONG_BREAK_AFTER_PERIODS.includes(currentPeriod)
+      ? SCHEDULE_PERIOD_LONG_BREAK_MINUTES
+      : SCHEDULE_PERIOD_BREAK_MINUTES;
+
+    startMinute += SCHEDULE_PERIOD_LENGTH_MINUTES + breakMinutes;
+  }
+
+  return startMinute;
+}
+
+function formatMinutes(minutes) {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  return `${String(hours).padStart(2, "0")}:${String(remainingMinutes).padStart(2, "0")}`;
+}
+
+function getPeriodFromTime(timeValue, fallbackPeriod) {
+  if (!timeValue) {
+    return fallbackPeriod;
+  }
+
+  const [hours, minutes] = timeValue.split(":").map(Number);
+  const totalMinutes = hours * 60 + minutes;
+
+  const matchedPeriod = SCHEDULE_PERIOD_OPTIONS.find((period) => {
+    const startMinute = getPeriodStartMinute(period);
+    const endMinute = startMinute + SCHEDULE_PERIOD_LENGTH_MINUTES;
+
+    return totalMinutes >= startMinute && totalMinutes <= endMinute;
+  });
+
+  return matchedPeriod || fallbackPeriod;
+}
+
+function normalizeSchedule(schedule) {
+  const startPeriod = Number(
+    schedule.startPeriod || getPeriodFromTime(schedule.startTime, 1),
+  );
+  const endPeriod = Number(
+    schedule.endPeriod || getPeriodFromTime(schedule.endTime, startPeriod),
+  );
+
+  return {
+    id: schedule.id,
+    subjectId: Number(schedule.subjectId) || 1,
+    dayOfWeek: schedule.dayOfWeek || SCHEDULE_DAY_OPTIONS[0],
+    startPeriod,
+    endPeriod: Math.max(startPeriod, endPeriod),
+    room: schedule.room || "",
+    note: schedule.note || "",
+  };
+}
+
+export function loadSchedules() {
+  return loadItems(SCHEDULES_STORAGE_KEY, DEFAULT_SCHEDULES).map(normalizeSchedule);
+}
+
+export function saveSchedules(schedules) {
+  saveItems(SCHEDULES_STORAGE_KEY, schedules.map(normalizeSchedule));
+}
+
+export function getNextScheduleId(schedules) {
+  return getNextId(schedules);
+}
+
+export function getPeriodTimeRange(startPeriod, endPeriod = startPeriod) {
+  const normalizedStartPeriod = Number(startPeriod) || 1;
+  const normalizedEndPeriod = Math.max(
+    normalizedStartPeriod,
+    Number(endPeriod) || normalizedStartPeriod,
+  );
+  const startMinute = getPeriodStartMinute(normalizedStartPeriod);
+  const endMinute =
+    getPeriodStartMinute(normalizedEndPeriod) + SCHEDULE_PERIOD_LENGTH_MINUTES;
+
+  return `${formatMinutes(startMinute)} - ${formatMinutes(endMinute)}`;
+}
+
+export function getSchedulePeriodLabel(schedule) {
+  if (Number(schedule.startPeriod) === Number(schedule.endPeriod)) {
+    return `Tiết ${schedule.startPeriod}`;
+  }
+
+  return `Tiết ${schedule.startPeriod} - ${schedule.endPeriod}`;
+}
+
+export function getScheduleTimeRange(schedule) {
+  return getPeriodTimeRange(schedule.startPeriod, schedule.endPeriod);
+}
+
+export function sortSchedulesByPeriod(schedules) {
+  return [...schedules].sort((firstSchedule, secondSchedule) => {
+    const startDiff =
+      Number(firstSchedule.startPeriod) - Number(secondSchedule.startPeriod);
+
+    if (startDiff !== 0) {
+      return startDiff;
+    }
+
+    return Number(firstSchedule.endPeriod) - Number(secondSchedule.endPeriod);
+  });
 }
