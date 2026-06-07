@@ -1,137 +1,62 @@
-export const SUBJECTS_STORAGE_KEY = "study-manager-subjects";
+import {
+  DEFAULT_DOCUMENTS,
+  DEFAULT_SCHEDULES,
+  DEFAULT_SUBJECTS,
+  DEFAULT_TASKS,
+  DOCUMENTS_STORAGE_KEY,
+  DOCUMENT_TYPE_OPTIONS,
+  SCHEDULE_DAY_OPTIONS,
+  SCHEDULE_LONG_BREAK_AFTER_PERIODS,
+  SCHEDULE_PERIOD_BREAK_MINUTES,
+  SCHEDULE_PERIOD_LENGTH_MINUTES,
+  SCHEDULE_PERIOD_LONG_BREAK_MINUTES,
+  SCHEDULE_PERIOD_OPTIONS,
+  SCHEDULES_STORAGE_KEY,
+  SUBJECTS_STORAGE_KEY,
+  TASKS_STORAGE_KEY,
+  TASK_WARNING_DAYS,
+} from "./constants";
 
-export const DEFAULT_SUBJECTS = [
-  {
-    id: 1,
-    name: "Lập trình Web",
-    code: "WEB101",
-    teacher: "Nguyễn Văn A",
-    credits: 3,
-    description: "Môn học về lập trình giao diện web",
-  },
-];
+export * from "./constants";
 
-export const TASKS_STORAGE_KEY = "study-manager-tasks";
+export const getStorageData = (key, defaultValue = []) => {
+  if (typeof localStorage === "undefined") {
+    return defaultValue;
+  }
 
-export const DEFAULT_TASKS = [
-  {
-    id: 1,
-    title: "Làm bài tập React",
-    subjectId: 1,
-    dueDate: "2026-06-10",
-    priority: "Cao",
-    status: "Chưa làm",
-    note: "Hoàn thành component quản lý môn học",
-  },
-];
+  const data = localStorage.getItem(key);
 
-export const TASK_STATUS_OPTIONS = ["Chưa làm", "Đang làm", "Hoàn thành"];
+  if (!data) {
+    return defaultValue;
+  }
 
-export const TASK_PRIORITY_OPTIONS = ["Thấp", "Trung bình", "Cao"];
+  try {
+    return JSON.parse(data);
+  } catch {
+    return defaultValue;
+  }
+};
 
-export const TASK_WARNING_DAYS = 3;
+export const setStorageData = (key, value) => {
+  if (typeof localStorage === "undefined") {
+    return;
+  }
 
-export const SCHEDULES_STORAGE_KEY = "study-manager-schedules";
-
-export const SCHEDULE_DAY_OPTIONS = [
-  "Thứ 2",
-  "Thứ 3",
-  "Thứ 4",
-  "Thứ 5",
-  "Thứ 6",
-  "Thứ 7",
-  "Chủ nhật",
-];
-
-export const SCHEDULE_PERIOD_OPTIONS = Array.from(
-  { length: 12 },
-  (_, index) => index + 1,
-);
-
-export const SCHEDULE_PERIOD_LENGTH_MINUTES = 45;
-
-export const SCHEDULE_PERIOD_BREAK_MINUTES = 5;
-
-export const SCHEDULE_PERIOD_LONG_BREAK_MINUTES = 15;
-
-export const SCHEDULE_LONG_BREAK_AFTER_PERIODS = [3, 9];
-
-export const DEFAULT_SCHEDULES = [
-  {
-    id: 1,
-    subjectId: 1,
-    dayOfWeek: "Thứ 2",
-    startPeriod: 1,
-    endPeriod: 3,
-    room: "A101",
-    note: "Học lý thuyết",
-  },
-];
-
-export const DOCUMENTS_STORAGE_KEY = "study-manager-documents";
-
-export const DOCUMENT_TYPE_OPTIONS = ["PDF", "DOCX", "PPTX", "Video", "Link", "Khác"];
-
-export const DEFAULT_DOCUMENTS = [
-  {
-    id: 1,
-    title: "Slide React cơ bản",
-    subjectId: 1,
-    fileName: "react-basic.pdf",
-    type: "PDF",
-    uploadDate: "2026-06-04",
-    description: "Tài liệu học React",
-  },
-];
-
-function canUseLocalStorage() {
-  return typeof window !== "undefined" && Boolean(window.localStorage);
-}
+  localStorage.setItem(key, JSON.stringify(value));
+};
 
 function cloneItems(items) {
   return items.map((item) => ({ ...item }));
 }
 
-function seedItems(storageKey, defaultItems) {
-  if (!canUseLocalStorage()) {
-    return cloneItems(defaultItems);
-  }
-
-  window.localStorage.setItem(storageKey, JSON.stringify(defaultItems));
-
-  return cloneItems(defaultItems);
-}
-
 function loadItems(storageKey, defaultItems) {
-  if (!canUseLocalStorage()) {
-    return cloneItems(defaultItems);
-  }
+  const items = getStorageData(storageKey, defaultItems);
 
-  const storedValue = window.localStorage.getItem(storageKey);
-
-  if (!storedValue) {
-    return seedItems(storageKey, defaultItems);
-  }
-
-  try {
-    const parsedValue = JSON.parse(storedValue);
-
-    if (!Array.isArray(parsedValue)) {
-      return seedItems(storageKey, defaultItems);
-    }
-
-    return parsedValue;
-  } catch {
-    return seedItems(storageKey, defaultItems);
-  }
+  return Array.isArray(items) ? cloneItems(items) : cloneItems(defaultItems);
 }
 
 function saveItems(storageKey, items) {
-  if (!canUseLocalStorage()) {
-    return;
-  }
-
-  window.localStorage.setItem(storageKey, JSON.stringify(items));
+  setStorageData(storageKey, items);
 }
 
 function getNextId(items) {
@@ -223,7 +148,11 @@ function getPeriodStartMinute(period) {
   const firstPeriodInSession = periodNumber >= 7 ? 7 : 1;
   let startMinute = sessionStartMinute;
 
-  for (let currentPeriod = firstPeriodInSession; currentPeriod < periodNumber; currentPeriod += 1) {
+  for (
+    let currentPeriod = firstPeriodInSession;
+    currentPeriod < periodNumber;
+    currentPeriod += 1
+  ) {
     const breakMinutes = SCHEDULE_LONG_BREAK_AFTER_PERIODS.includes(currentPeriod)
       ? SCHEDULE_PERIOD_LONG_BREAK_MINUTES
       : SCHEDULE_PERIOD_BREAK_MINUTES;
