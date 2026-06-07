@@ -1,14 +1,27 @@
+import EmptyState from "../ui/EmptyState";
 import SubjectCard from "./SubjectCard";
 
-function SubjectList({ subjects, onEdit, onDelete }) {
+function SubjectList({
+  subjects,
+  hasSubjects,
+  hasActiveFilters,
+  onEdit,
+  onDelete,
+}) {
   if (subjects.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center">
-        <p className="text-base font-medium text-slate-700">Không tìm thấy môn học phù hợp.</p>
-        <p className="mt-2 text-sm text-slate-500">
-          Hãy thử đổi từ khóa tìm kiếm hoặc thêm môn học mới.
-        </p>
-      </div>
+      <EmptyState
+        title={
+          hasSubjects && hasActiveFilters
+            ? "Không tìm thấy môn học phù hợp."
+            : "Chưa có môn học nào."
+        }
+        description={
+          hasSubjects && hasActiveFilters
+            ? "Hãy thử đổi từ khóa tìm kiếm hoặc xóa bộ lọc hiện tại."
+            : "Nhấn nút Thêm môn học để tạo môn học đầu tiên."
+        }
+      />
     );
   }
 

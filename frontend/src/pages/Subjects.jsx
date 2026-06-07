@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import SubjectForm from "../components/subjects/SubjectForm";
 import SubjectList from "../components/subjects/SubjectList";
+import Toast from "../components/ui/Toast";
 import { getNextSubjectId, loadSubjects, saveSubjects } from "../utils/storage";
 
 function Subjects() {
@@ -9,6 +10,7 @@ function Subjects() {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingSubject, setEditingSubject] = useState(null);
   const [isAddFormVisible, setIsAddFormVisible] = useState(false);
+  const [feedback, setFeedback] = useState(null);
 
   useEffect(() => {
     saveSubjects(subjects);
@@ -35,7 +37,12 @@ function Subjects() {
     });
   }, [searchTerm, subjects]);
 
+  const showFeedback = (type, message) => {
+    setFeedback({ id: Date.now(), type, message });
+  };
+
   const isFormVisible = isAddFormVisible || Boolean(editingSubject);
+  const hasActiveFilters = Boolean(searchTerm.trim());
 
   const openAddForm = () => {
     setEditingSubject(null);
@@ -48,28 +55,34 @@ function Subjects() {
   };
 
   const handleSubmit = (subjectData) => {
-    if (editingSubject) {
-      setSubjects((currentSubjects) =>
-        currentSubjects.map((subject) =>
-          subject.id === editingSubject.id
-            ? { ...subject, ...subjectData }
-            : subject,
-        ),
-      );
-      closeForm();
-      return;
+    try {
+      if (editingSubject) {
+        setSubjects((currentSubjects) =>
+          currentSubjects.map((subject) =>
+            subject.id === editingSubject.id
+              ? { ...subject, ...subjectData }
+              : subject,
+          ),
+        );
+        closeForm();
+        showFeedback("success", "Đã cập nhật môn học.");
+        return;
+      }
+
+      setSubjects((currentSubjects) => {
+        const nextSubject = {
+          id: getNextSubjectId(currentSubjects),
+          ...subjectData,
+        };
+
+        return [...currentSubjects, nextSubject];
+      });
+
+      setIsAddFormVisible(false);
+      showFeedback("success", "Đã thêm môn học.");
+    } catch {
+      showFeedback("error", "Không thể lưu môn học. Thử lại giúp mình nhé.");
     }
-
-    setSubjects((currentSubjects) => {
-      const nextSubject = {
-        id: getNextSubjectId(currentSubjects),
-        ...subjectData,
-      };
-
-      return [...currentSubjects, nextSubject];
-    });
-
-    setIsAddFormVisible(false);
   };
 
   const handleEdit = (subject) => {
@@ -84,12 +97,18 @@ function Subjects() {
       return;
     }
 
-    setSubjects((currentSubjects) =>
-      currentSubjects.filter((subject) => subject.id !== subjectId),
-    );
+    try {
+      setSubjects((currentSubjects) =>
+        currentSubjects.filter((subject) => subject.id !== subjectId),
+      );
 
-    if (editingSubject?.id === subjectId) {
-      closeForm();
+      if (editingSubject?.id === subjectId) {
+        closeForm();
+      }
+
+      showFeedback("success", "Đã xóa môn học.");
+    } catch {
+      showFeedback("error", "Không thể xóa môn học. Thử lại giúp mình nhé.");
     }
   };
 
@@ -98,7 +117,9 @@ function Subjects() {
 
   return (
     <div className="space-y-6">
-      <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:flex-row lg:items-end lg:justify-between">
+      <Toast feedback={feedback} onClose={() => setFeedback(null)} />
+
+      <section className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
             Quản lý môn học
@@ -136,22 +157,26 @@ function Subjects() {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">Tổng môn học</p>
           <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
             {totalSubjects}
           </p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">Kết quả lọc</p>
           <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
             {visibleSubjects}
           </p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">Chế độ</p>
           <p className="mt-2 text-base font-semibold tracking-tight text-slate-900">
-            {editingSubject ? "Đang chỉnh sửa" : isAddFormVisible ? "Đang thêm mới" : "Đang ẩn form"}
+            {editingSubject
+              ? "Đang chỉnh sửa"
+              : isAddFormVisible
+                ? "Đang thêm mới"
+                : "Đang ẩn form"}
           </p>
         </div>
       </section>
@@ -163,16 +188,7 @@ function Subjects() {
           onSubmit={handleSubmit}
           onCancel={closeForm}
         />
-      ) : (
-        <section className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center shadow-sm">
-          <p className="text-lg font-semibold tracking-tight text-slate-900">
-            Chưa mở form thêm môn học
-          </p>
-          <p className="mt-2 text-sm leading-6 text-slate-500">
-            Nhấn nút <span className="font-medium text-slate-700">Thêm môn học</span> để nhập dữ liệu mới.
-          </p>
-        </section>
-      )}
+      ) : null}
 
       <section>
         <div className="mb-4 flex items-center justify-between gap-4">
@@ -186,7 +202,13 @@ function Subjects() {
           </div>
         </div>
 
-        <SubjectList subjects={filteredSubjects} onEdit={handleEdit} onDelete={handleDelete} />
+        <SubjectList
+          subjects={filteredSubjects}
+          hasSubjects={totalSubjects > 0}
+          hasActiveFilters={hasActiveFilters}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
       </section>
     </div>
   );

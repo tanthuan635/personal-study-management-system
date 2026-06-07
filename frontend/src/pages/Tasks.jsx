@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import TaskFilter from "../components/tasks/TaskFilter";
 import TaskForm from "../components/tasks/TaskForm";
 import TaskList from "../components/tasks/TaskList";
+import Toast from "../components/ui/Toast";
 import {
   getNextTaskId,
   getTaskDeadlineState,
@@ -18,6 +19,7 @@ function Tasks() {
   const [priorityFilter, setPriorityFilter] = useState("");
   const [editingTask, setEditingTask] = useState(null);
   const [activeFormMode, setActiveFormMode] = useState(null);
+  const [feedback, setFeedback] = useState(null);
 
   useEffect(() => {
     saveTasks(tasks);
@@ -55,6 +57,10 @@ function Tasks() {
     );
   }, [tasks]);
 
+  const showFeedback = (type, message) => {
+    setFeedback({ id: Date.now(), type, message });
+  };
+
   const hasActiveFilters = Boolean(statusFilter || priorityFilter);
   const isFormVisible = activeFormMode !== null;
   const addButtonLabel = activeFormMode === "add" ? "Đóng form" : "Thêm deadline";
@@ -76,26 +82,32 @@ function Tasks() {
   };
 
   const handleSubmit = (taskData) => {
-    if (activeFormMode === "edit" && editingTask) {
-      setTasks((currentTasks) =>
-        currentTasks.map((task) =>
-          task.id === editingTask.id ? { ...task, ...taskData } : task,
-        ),
-      );
+    try {
+      if (activeFormMode === "edit" && editingTask) {
+        setTasks((currentTasks) =>
+          currentTasks.map((task) =>
+            task.id === editingTask.id ? { ...task, ...taskData } : task,
+          ),
+        );
+        closeForm();
+        showFeedback("success", "Đã cập nhật deadline.");
+        return;
+      }
+
+      setTasks((currentTasks) => {
+        const nextTask = {
+          id: getNextTaskId(currentTasks),
+          ...taskData,
+        };
+
+        return [...currentTasks, nextTask];
+      });
+
       closeForm();
-      return;
+      showFeedback("success", "Đã thêm deadline.");
+    } catch {
+      showFeedback("error", "Không thể lưu deadline. Thử lại giúp mình nhé.");
     }
-
-    setTasks((currentTasks) => {
-      const nextTask = {
-        id: getNextTaskId(currentTasks),
-        ...taskData,
-      };
-
-      return [...currentTasks, nextTask];
-    });
-
-    closeForm();
   };
 
   const handleEdit = (task) => {
@@ -110,24 +122,36 @@ function Tasks() {
       return;
     }
 
-    setTasks((currentTasks) =>
-      currentTasks.filter((task) => task.id !== taskId),
-    );
+    try {
+      setTasks((currentTasks) =>
+        currentTasks.filter((task) => task.id !== taskId),
+      );
 
-    if (editingTask?.id === taskId) {
-      closeForm();
+      if (editingTask?.id === taskId) {
+        closeForm();
+      }
+
+      showFeedback("success", "Đã xóa deadline.");
+    } catch {
+      showFeedback("error", "Không thể xóa deadline. Thử lại giúp mình nhé.");
     }
   };
 
   const handleToggleComplete = (taskId) => {
-    setTasks((currentTasks) =>
-      currentTasks.map((task) =>
-        task.id === taskId ? { ...task, status: "Hoàn thành" } : task,
-      ),
-    );
+    try {
+      setTasks((currentTasks) =>
+        currentTasks.map((task) =>
+          task.id === taskId ? { ...task, status: "Hoàn thành" } : task,
+        ),
+      );
 
-    if (editingTask?.id === taskId) {
-      closeForm();
+      if (editingTask?.id === taskId) {
+        closeForm();
+      }
+
+      showFeedback("success", "Đã đánh dấu deadline hoàn thành.");
+    } catch {
+      showFeedback("error", "Không thể cập nhật deadline. Thử lại giúp mình nhé.");
     }
   };
 
@@ -135,7 +159,9 @@ function Tasks() {
 
   return (
     <div className="space-y-6">
-      <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:flex-row lg:items-end lg:justify-between">
+      <Toast feedback={feedback} onClose={() => setFeedback(null)} />
+
+      <section className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
             Quản lý deadline
@@ -161,25 +187,25 @@ function Tasks() {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">Tổng deadline</p>
           <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
             {totalTasks}
           </p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">Quá hạn</p>
           <p className="mt-2 text-3xl font-semibold tracking-tight text-rose-700">
             {taskStats.overdue}
           </p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">Sắp tới</p>
           <p className="mt-2 text-3xl font-semibold tracking-tight text-amber-700">
             {taskStats.dueSoon}
           </p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">Hoàn thành</p>
           <p className="mt-2 text-3xl font-semibold tracking-tight text-emerald-700">
             {taskStats.completed}
@@ -206,16 +232,7 @@ function Tasks() {
           onSubmit={handleSubmit}
           onCancel={closeForm}
         />
-      ) : (
-        <section className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center shadow-sm">
-          <p className="text-lg font-semibold tracking-tight text-slate-900">
-            Chưa mở form thêm deadline
-          </p>
-          <p className="mt-2 text-sm leading-6 text-slate-500">
-            Nhấn nút <span className="font-medium text-slate-700">Thêm deadline</span> để tạo deadline mới.
-          </p>
-        </section>
-      )}
+      ) : null}
 
       <section>
         <div className="mb-4 flex items-center justify-between gap-4">
@@ -232,6 +249,7 @@ function Tasks() {
         <TaskList
           tasks={filteredTasks}
           subjects={subjects}
+          hasTasks={totalTasks > 0}
           hasActiveFilters={hasActiveFilters}
           onEdit={handleEdit}
           onDelete={handleDelete}

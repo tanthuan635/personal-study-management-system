@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import DocumentForm from "../components/documents/DocumentForm";
 import DocumentList from "../components/documents/DocumentList";
+import Toast from "../components/ui/Toast";
 import {
   getNextDocumentId,
   loadDocuments,
@@ -15,6 +16,7 @@ function Documents() {
   const [searchTerm, setSearchTerm] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [feedback, setFeedback] = useState(null);
 
   useEffect(() => {
     saveDocuments(documents);
@@ -60,20 +62,29 @@ function Documents() {
     return new Set(documents.map((documentItem) => documentItem.type)).size;
   }, [documents]);
 
+  const showFeedback = (type, message) => {
+    setFeedback({ id: Date.now(), type, message });
+  };
+
   const hasActiveFilters = Boolean(searchTerm.trim() || subjectFilter);
   const addButtonLabel = isFormVisible ? "Đóng form" : "Thêm tài liệu";
 
   const handleSubmit = (documentData) => {
-    setDocuments((currentDocuments) => {
-      const nextDocument = {
-        id: getNextDocumentId(currentDocuments),
-        ...documentData,
-      };
+    try {
+      setDocuments((currentDocuments) => {
+        const nextDocument = {
+          id: getNextDocumentId(currentDocuments),
+          ...documentData,
+        };
 
-      return [...currentDocuments, nextDocument];
-    });
+        return [...currentDocuments, nextDocument];
+      });
 
-    setIsFormVisible(false);
+      setIsFormVisible(false);
+      showFeedback("success", "Đã thêm tài liệu.");
+    } catch {
+      showFeedback("error", "Không thể lưu tài liệu. Thử lại giúp mình nhé.");
+    }
   };
 
   const handleDelete = (documentId) => {
@@ -83,14 +94,21 @@ function Documents() {
       return;
     }
 
-    setDocuments((currentDocuments) =>
-      currentDocuments.filter((documentItem) => documentItem.id !== documentId),
-    );
+    try {
+      setDocuments((currentDocuments) =>
+        currentDocuments.filter((documentItem) => documentItem.id !== documentId),
+      );
+      showFeedback("success", "Đã xóa tài liệu.");
+    } catch {
+      showFeedback("error", "Không thể xóa tài liệu. Thử lại giúp mình nhé.");
+    }
   };
 
   return (
     <div className="space-y-6">
-      <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:flex-row lg:items-end lg:justify-between">
+      <Toast feedback={feedback} onClose={() => setFeedback(null)} />
+
+      <section className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
             Quản lý tài liệu
@@ -115,19 +133,19 @@ function Documents() {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">Tổng tài liệu</p>
           <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
             {documents.length}
           </p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">Đang hiển thị</p>
           <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
             {filteredDocuments.length}
           </p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">Loại tài liệu</p>
           <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
             {typeCount}
@@ -135,7 +153,7 @@ function Documents() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="grid gap-4 lg:grid-cols-[1fr,320px]">
           <label>
             <span className="mb-2 block text-sm font-medium text-slate-700">
@@ -176,16 +194,7 @@ function Documents() {
           onSubmit={handleSubmit}
           onCancel={() => setIsFormVisible(false)}
         />
-      ) : (
-        <section className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center shadow-sm">
-          <p className="text-lg font-semibold tracking-tight text-slate-900">
-            Chưa mở form thêm tài liệu
-          </p>
-          <p className="mt-2 text-sm leading-6 text-slate-500">
-            Nhấn nút <span className="font-medium text-slate-700">Thêm tài liệu</span> để lưu thông tin file mới.
-          </p>
-        </section>
-      )}
+      ) : null}
 
       <section>
         <div className="mb-4 flex items-center justify-between gap-4">

@@ -1,10 +1,12 @@
 import { useMemo } from "react";
 
+import EmptyState from "../ui/EmptyState";
 import TaskCard from "./TaskCard";
 
 function TaskList({
   tasks,
   subjects,
+  hasTasks,
   hasActiveFilters,
   onEdit,
   onDelete,
@@ -16,18 +18,18 @@ function TaskList({
 
   if (tasks.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center">
-        <p className="text-base font-medium text-slate-700">
-          {hasActiveFilters
+      <EmptyState
+        title={
+          hasTasks && hasActiveFilters
             ? "Không tìm thấy deadline phù hợp."
-            : "Chưa có deadline nào."}
-        </p>
-        <p className="mt-2 text-sm text-slate-500">
-          {hasActiveFilters
+            : "Chưa có deadline nào."
+        }
+        description={
+          hasTasks && hasActiveFilters
             ? "Hãy đổi bộ lọc hoặc tạo deadline mới."
-            : "Nhấn nút Thêm deadline để tạo công việc đầu tiên."}
-        </p>
-      </div>
+            : "Nhấn nút Thêm deadline để tạo công việc đầu tiên."
+        }
+      />
     );
   }
 

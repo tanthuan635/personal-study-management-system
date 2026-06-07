@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import ScheduleForm from "../components/schedule/ScheduleForm";
 import ScheduleTable from "../components/schedule/ScheduleTable";
+import Toast from "../components/ui/Toast";
 import {
   getNextScheduleId,
   loadSchedules,
@@ -16,6 +17,7 @@ function Schedule() {
   const [subjectFilter, setSubjectFilter] = useState("");
   const [editingSchedule, setEditingSchedule] = useState(null);
   const [activeFormMode, setActiveFormMode] = useState(null);
+  const [feedback, setFeedback] = useState(null);
 
   useEffect(() => {
     saveSchedules(schedules);
@@ -35,6 +37,10 @@ function Schedule() {
     const days = new Set(filteredSchedules.map((schedule) => schedule.dayOfWeek));
     return days.size;
   }, [filteredSchedules]);
+
+  const showFeedback = (type, message) => {
+    setFeedback({ id: Date.now(), type, message });
+  };
 
   const isFormVisible = activeFormMode !== null;
   const addButtonLabel = activeFormMode === "add" ? "Đóng form" : "Thêm lịch học";
@@ -56,28 +62,34 @@ function Schedule() {
   };
 
   const handleSubmit = (scheduleData) => {
-    if (activeFormMode === "edit" && editingSchedule) {
-      setSchedules((currentSchedules) =>
-        currentSchedules.map((schedule) =>
-          schedule.id === editingSchedule.id
-            ? { ...schedule, ...scheduleData }
-            : schedule,
-        ),
-      );
+    try {
+      if (activeFormMode === "edit" && editingSchedule) {
+        setSchedules((currentSchedules) =>
+          currentSchedules.map((schedule) =>
+            schedule.id === editingSchedule.id
+              ? { ...schedule, ...scheduleData }
+              : schedule,
+          ),
+        );
+        closeForm();
+        showFeedback("success", "Đã cập nhật lịch học.");
+        return;
+      }
+
+      setSchedules((currentSchedules) => {
+        const nextSchedule = {
+          id: getNextScheduleId(currentSchedules),
+          ...scheduleData,
+        };
+
+        return [...currentSchedules, nextSchedule];
+      });
+
       closeForm();
-      return;
+      showFeedback("success", "Đã thêm lịch học.");
+    } catch {
+      showFeedback("error", "Không thể lưu lịch học. Thử lại giúp mình nhé.");
     }
-
-    setSchedules((currentSchedules) => {
-      const nextSchedule = {
-        id: getNextScheduleId(currentSchedules),
-        ...scheduleData,
-      };
-
-      return [...currentSchedules, nextSchedule];
-    });
-
-    closeForm();
   };
 
   const handleEdit = (schedule) => {
@@ -92,18 +104,26 @@ function Schedule() {
       return;
     }
 
-    setSchedules((currentSchedules) =>
-      currentSchedules.filter((schedule) => schedule.id !== scheduleId),
-    );
+    try {
+      setSchedules((currentSchedules) =>
+        currentSchedules.filter((schedule) => schedule.id !== scheduleId),
+      );
 
-    if (editingSchedule?.id === scheduleId) {
-      closeForm();
+      if (editingSchedule?.id === scheduleId) {
+        closeForm();
+      }
+
+      showFeedback("success", "Đã xóa lịch học.");
+    } catch {
+      showFeedback("error", "Không thể xóa lịch học. Thử lại giúp mình nhé.");
     }
   };
 
   return (
     <div className="space-y-6">
-      <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:flex-row lg:items-end lg:justify-between">
+      <Toast feedback={feedback} onClose={() => setFeedback(null)} />
+
+      <section className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
             Quản lý lịch học
@@ -147,19 +167,19 @@ function Schedule() {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">Tổng lịch học</p>
           <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
             {schedules.length}
           </p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">Đang hiển thị</p>
           <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
             {filteredSchedules.length}
           </p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">Số ngày có lịch</p>
           <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
             {visibleDayCount} / {SCHEDULE_DAY_OPTIONS.length}
@@ -175,16 +195,7 @@ function Schedule() {
           onSubmit={handleSubmit}
           onCancel={closeForm}
         />
-      ) : (
-        <section className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center shadow-sm">
-          <p className="text-lg font-semibold tracking-tight text-slate-900">
-            Chưa mở form thêm lịch học
-          </p>
-          <p className="mt-2 text-sm leading-6 text-slate-500">
-            Nhấn nút <span className="font-medium text-slate-700">Thêm lịch học</span> để tạo buổi học mới.
-          </p>
-        </section>
-      )}
+      ) : null}
 
       <section>
         <div className="mb-4 flex items-center justify-between gap-4">
