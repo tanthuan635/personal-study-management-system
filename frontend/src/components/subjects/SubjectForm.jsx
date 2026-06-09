@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function getEmptyForm() {
   return {
@@ -27,10 +27,6 @@ function getFormValue(initialSubject) {
 function SubjectForm({ mode = "add", initialSubject, onSubmit, onCancel }) {
   const [formData, setFormData] = useState(() => getFormValue(initialSubject));
   const isEditing = mode === "edit";
-
-  useEffect(() => {
-    setFormData(getFormValue(initialSubject));
-  }, [initialSubject]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;

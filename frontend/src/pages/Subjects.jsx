@@ -158,6 +158,7 @@ function Subjects() {
 
       {isFormVisible ? (
         <SubjectForm
+          key={editingSubject ? `edit-${editingSubject.id}` : "add-subject"}
           mode={editingSubject ? "edit" : "add"}
           initialSubject={editingSubject}
           onSubmit={handleSubmit}

@@ -200,6 +200,7 @@ function Tasks() {
 
       {isFormVisible ? (
         <TaskForm
+          key={editingTask ? `edit-${editingTask.id}` : "add-task"}
           mode={activeFormMode === "edit" ? "edit" : "add"}
           initialTask={editingTask}
           subjects={subjects}

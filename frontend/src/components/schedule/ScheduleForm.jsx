@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   getPeriodTimeRange,
@@ -43,10 +43,6 @@ function ScheduleForm({
     getFormValue(initialSchedule, subjects),
   );
   const isEditing = mode === "edit";
-
-  useEffect(() => {
-    setFormData(getFormValue(initialSchedule, subjects));
-  }, [initialSchedule, subjects]);
 
   const selectedSubjectExists = useMemo(() => {
     return subjects.some((subject) => String(subject.id) === formData.subjectId);

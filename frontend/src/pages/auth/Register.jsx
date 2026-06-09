@@ -48,8 +48,8 @@ function Register() {
         <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
           Đăng ký
         </h2>
-        <p className="mt-2 text-sm text-slate-500">
-          Tạo tài khoản để lưu thông tin đăng nhập.
+        <p className="mt-2 text-sm leading-6 text-slate-500">
+          Tạo tài khoản để lưu thông tin đăng nhập tạm thời.
         </p>
       </div>
 

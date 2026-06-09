@@ -58,9 +58,11 @@ function Login() {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold tracking-tight text-slate-900">Đăng nhập</h2>
-        <p className="mt-2 text-sm text-slate-500">
-          Nhập email và mật khẩu.
+        <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
+          Đăng nhập
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-slate-500">
+          Nhập email và mật khẩu để vào trang quản lý học tập.
         </p>
       </div>
 
@@ -102,7 +104,10 @@ function Login() {
 
       <p className="mt-4 text-sm text-slate-600">
         Chưa có tài khoản?{" "}
-        <Link to="/register" className="font-medium text-slate-900 underline underline-offset-4">
+        <Link
+          to="/register"
+          className="font-medium text-slate-900 underline underline-offset-4"
+        >
           Đăng ký
         </Link>
       </p>

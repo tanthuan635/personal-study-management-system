@@ -169,6 +169,7 @@ function Schedule() {
 
       {isFormVisible ? (
         <ScheduleForm
+          key={editingSchedule ? `edit-${editingSchedule.id}` : "add-schedule"}
           mode={activeFormMode === "edit" ? "edit" : "add"}
           initialSchedule={editingSchedule}
           subjects={subjects}

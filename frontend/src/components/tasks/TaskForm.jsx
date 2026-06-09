@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   TASK_PRIORITY_OPTIONS,
@@ -34,10 +34,6 @@ function getFormValue(initialTask, subjects) {
 function TaskForm({ mode = "add", initialTask, subjects, onSubmit, onCancel }) {
   const [formData, setFormData] = useState(() => getFormValue(initialTask, subjects));
   const isEditing = mode === "edit";
-
-  useEffect(() => {
-    setFormData(getFormValue(initialTask, subjects));
-  }, [initialTask, subjects]);
 
   const selectedSubjectExists = useMemo(() => {
     return subjects.some((subject) => String(subject.id) === formData.subjectId);
