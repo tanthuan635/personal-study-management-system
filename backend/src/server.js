@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const express = require("express");
 const morgan = require("morgan");
 
+const connectDB = require("./config/db");
 const healthRoutes = require("./routes/healthRoutes");
 
 dotenv.config();
@@ -23,6 +24,17 @@ app.use((req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+async function startServer() {
+  try {
+    await connectDB();
+
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error(`Failed to start server: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+startServer();
