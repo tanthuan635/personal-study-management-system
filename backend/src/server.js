@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const healthRoutes = require("./routes/healthRoutes");
+const subjectRoutes = require("./routes/subjectRoutes");
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(morgan("dev"));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/health", healthRoutes);
+app.use("/api/subjects", subjectRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
