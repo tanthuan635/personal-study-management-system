@@ -6,7 +6,9 @@ const morgan = require("morgan");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const healthRoutes = require("./routes/healthRoutes");
+const scheduleRoutes = require("./routes/scheduleRoutes");
 const subjectRoutes = require("./routes/subjectRoutes");
+const taskRoutes = require("./routes/taskRoutes");
 
 dotenv.config();
 
@@ -19,7 +21,9 @@ app.use(morgan("dev"));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/health", healthRoutes);
+app.use("/api/schedules", scheduleRoutes);
 app.use("/api/subjects", subjectRoutes);
+app.use("/api/tasks", taskRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
