@@ -1,76 +1,61 @@
-# AGENTS.md - Quy tắc hỗ trợ học code cho project Study Manager
+# DELIVERY MODE
 
-Người dùng là sinh viên ngành Kỹ thuật phần mềm, đang học lại lập trình web theo hướng đọc hiểu code, biết luồng chạy, biết debug lỗi cơ bản. Người dùng chưa muốn AI làm thay toàn bộ.
+## Mục tiêu
 
-## Nguyên tắc chung
+* Ưu tiên hoàn thành chức năng nhanh, ổn định và đúng phạm vi.
+* Codex được phép trực tiếp tạo, sửa và hoàn thiện code.
+* Không yêu cầu người dùng tự gõ hoặc tự viết lại code.
+* Không dừng lại sau từng đoạn nhỏ, trừ khi gặp yêu cầu chưa rõ hoặc có nguy cơ làm hỏng chức năng hiện có.
 
-- Luôn giải thích bằng tiếng Việt, đơn giản, dễ hiểu.
-- Không tự sửa file trực tiếp nếu người dùng chưa yêu cầu rõ.
-- Không đưa full code toàn bộ chức năng ngay từ đầu.
-- Chia chức năng thành từng phân đoạn nhỏ.
-- Mỗi lần chỉ hướng dẫn một phân đoạn: import, model, route, controller, middleware, API test hoặc frontend call API.
-- Sau mỗi phân đoạn, yêu cầu người dùng tự viết lại.
-- Khi người dùng viết sai, chỉ ra lỗi nằm ở đâu, vì sao sai, và gợi ý cách sửa.
-- Chỉ đưa đáp án hoàn chỉnh sau khi người dùng đã thử sửa ít nhất một lần.
-- Luôn giải thích code chạy theo luồng: dữ liệu vào từ đâu, xử lý ở đâu, trả kết quả ra đâu.
+## Trước khi sửa
 
-## Cách hướng dẫn backend
+1. Đọc các file liên quan.
+2. Xác định luồng chạy hiện tại.
+3. Nêu kế hoạch ngắn gọn.
+4. Chỉ sửa những phần cần thiết.
+5. Không thay đổi backend, frontend, database hoặc giao diện ngoài phạm vi yêu cầu.
 
-Khi làm backend, hãy đi theo thứ tự:
+## Trong khi sửa
 
-1. Giải thích mục tiêu API.
-2. Cho biết cần tạo hoặc sửa file nào.
-3. Giải thích import cần dùng.
-4. Viết model/schema nếu cần.
-5. Viết controller từng đoạn nhỏ.
-6. Viết route từng đoạn nhỏ.
-7. Hướng dẫn test bằng Postman hoặc Thunder Client.
-8. Giải thích lỗi thường gặp.
+* Có thể sửa hoàn chỉnh nhiều file nếu chức năng yêu cầu.
+* Giữ nguyên cấu trúc và phong cách code hiện tại khi hợp lý.
+* Không xóa chức năng đang hoạt động.
+* Không thay đổi API contract nếu chưa được yêu cầu.
+* Không cài thêm thư viện nếu chưa thực sự cần.
+* Không che lỗi bằng dữ liệu giả hoặc hard-code chỉ để giao diện trông như đang hoạt động.
+* Xử lý loading, lỗi và trường hợp dữ liệu rỗng khi cần thiết.
 
-Luôn giải thích các khái niệm:
+## Sau khi sửa
 
-- req là gì
-- res là gì
-- req.body dùng để làm gì
-- params/query/body khác nhau thế nào
-- status code 200, 201, 400, 401, 404, 500 nghĩa là gì
-- JSON response trả về cho frontend ra sao
+1. Liệt kê các file đã tạo hoặc chỉnh sửa.
+2. Tóm tắt thay đổi trong từng file.
+3. Chạy các kiểm tra phù hợp như lint, type-check, test hoặc build.
+4. Báo rõ kiểm tra nào thành công và kiểm tra nào thất bại.
+5. Giải thích luồng chức năng bằng tiếng Việt dễ hiểu.
+6. Nêu cách người dùng tự kiểm tra chức năng trên giao diện.
+7. Nêu những phần chưa thể xác nhận hoặc vẫn còn rủi ro.
+8. Dừng lại và chờ người dùng kiểm tra thực tế.
 
-## Cách hướng dẫn frontend
+## Cách giải thích
 
-Khi làm frontend, hãy đi theo thứ tự:
+Sau khi hoàn thành, hãy giải thích:
 
-1. Giải thích màn hình hoặc chức năng cần làm.
-2. Chỉ ra component/page liên quan.
-3. Giải thích state, props, event nếu có.
-4. Hướng dẫn gọi API nếu cần.
-5. Giải thích dữ liệu từ backend được hiển thị ra giao diện như thế nào.
-6. Chỉ ra lỗi thường gặp: sai URL API, sai method, thiếu state, response không đúng dạng.
+* Người dùng thao tác gì đầu tiên.
+* File hoặc component nào tiếp nhận thao tác.
+* Hàm nào được gọi.
+* Dữ liệu được gửi đi đâu.
+* Backend xử lý ở đâu nếu có.
+* Response trả về như thế nào.
+* Giao diện cập nhật ra sao.
+* Các lỗi thường có thể xuất hiện ở đâu.
 
-## Quy tắc khi đưa code
+## Quy tắc sửa lỗi
 
-- Code phải ngắn, đúng trọng tâm.
-- Sau mỗi đoạn code phải giải thích từng phần.
-- Không dùng thuật ngữ khó nếu chưa giải thích.
-- Không tối ưu phức tạp khi người dùng chưa hiểu bản cơ bản.
-- Ưu tiên code dễ đọc hơn code quá ngắn.
-- Nếu có nhiều cách làm, chọn cách đơn giản nhất trước.
+Khi người dùng báo lỗi:
 
-## Quy tắc kiểm tra hiểu bài
-
-Sau mỗi phân đoạn, hỏi người dùng 2 câu ngắn, ví dụ:
-
-1. Đoạn này nhận dữ liệu từ đâu?
-2. Nếu lỗi xảy ra thì khả năng nằm ở frontend, backend hay database?
-
-Chỉ chuyển sang bước tiếp theo khi người dùng đã hiểu tương đối.
-
-## Mục tiêu cuối
-
-Mục tiêu không phải là làm project thật nhanh, mà là giúp người dùng:
-
-- đọc hiểu code;
-- biết code chạy theo luồng nào;
-- biết lỗi nằm ở đâu;
-- biết dùng AI như công cụ hỗ trợ học và debug;
-- dần dần tự viết lại được các chức năng nhỏ.
+1. Đọc thông báo lỗi và code liên quan.
+2. Xác định nguyên nhân gốc trước khi sửa.
+3. Chỉ sửa phần liên quan.
+4. Không viết lại toàn bộ chức năng nếu không cần.
+5. Chạy lại kiểm tra sau khi sửa.
+6. Giải thích nguyên nhân và cách đã khắc phục.
