@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../components/layout/Header";
 import Sidebar from "../components/layout/Sidebar";
 import { clearSessionUser, getSessionUser } from "../lib/auth";
+import { removeToken } from "../utils/tokenStorage";
 
 const pageMeta = {
   "/dashboard": {
@@ -38,6 +39,7 @@ function MainLayout({ children }) {
   const currentPage = pageMeta[location.pathname] ?? pageMeta["/dashboard"];
 
   const handleLogout = () => {
+    removeToken();
     clearSessionUser();
     navigate("/login", { replace: true });
   };

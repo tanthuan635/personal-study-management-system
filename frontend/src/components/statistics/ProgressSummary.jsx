@@ -1,37 +1,6 @@
-function formatDisplayDate(dateValue) {
-  const parsedDate = new Date(`${dateValue}T00:00:00`);
-
-  if (Number.isNaN(parsedDate.getTime())) {
-    return dateValue;
-  }
-
-  return new Intl.DateTimeFormat("vi-VN").format(parsedDate);
-}
-
-function getDeadlineLabel(daysUntilDue) {
-  if (daysUntilDue < 0) {
-    return `Quá hạn ${Math.abs(daysUntilDue)} ngày`;
-  }
-
-  if (daysUntilDue === 0) {
-    return "Hết hạn hôm nay";
-  }
-
-  return `Còn ${daysUntilDue} ngày`;
-}
-
-function ProgressSummary({ summary, subjects }) {
-  const topSubject = summary.topSubject;
-  const nearestDeadline = summary.nearestDeadline;
-  const nearestSubject = nearestDeadline
-    ? subjects.find(
-        (subject) =>
-          Number(subject.id) === Number(nearestDeadline.task.subjectId),
-      )
-    : null;
-
+function ProgressSummary({ summary }) {
   return (
-    <section className="grid gap-4 xl:grid-cols-[1fr,1fr]">
+    <section className="grid gap-4 xl:grid-cols-2">
       <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -59,55 +28,34 @@ function ProgressSummary({ summary, subjects }) {
         </p>
       </article>
 
-      <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-          Môn nhiều deadline nhất
+      <article className="rounded-2xl border border-rose-200 bg-rose-50 p-5 shadow-sm">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-rose-500">
+          Deadline quá hạn
         </p>
-        {topSubject && topSubject.totalTasks > 0 ? (
-          <div className="mt-3">
-            <h2 className="text-lg font-semibold tracking-tight text-slate-900">
-              {topSubject.subject.name}
-            </h2>
-            <p className="mt-1 text-sm text-slate-500">
-              {topSubject.subject.code} · {topSubject.totalTasks} deadline
-            </p>
-            <p className="mt-3 text-sm text-slate-600">
-              Hoàn thành {topSubject.completedTasks}, chưa hoàn thành{" "}
-              {topSubject.pendingTasks}.
-            </p>
-          </div>
-        ) : (
-          <p className="mt-3 text-sm text-slate-500">
-            Chưa có deadline nào để thống kê theo môn.
-          </p>
-        )}
+        <p className="mt-3 text-3xl font-semibold tracking-tight text-rose-700">
+          {summary.overdueTasks}
+        </p>
+        <p className="mt-2 text-sm text-rose-700">
+          {summary.overdueTasks > 0
+            ? "Các deadline này chưa hoàn thành và đã qua ngày hết hạn."
+            : "Không có deadline nào đang bị quá hạn."}
+        </p>
       </article>
 
-      <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:col-span-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-          Deadline gần nhất
+      <article className="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm xl:col-span-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-600">
+          Deadline sắp tới
         </p>
-        {nearestDeadline ? (
-          <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <h2 className="text-lg font-semibold tracking-tight text-slate-900">
-                {nearestDeadline.task.title}
-              </h2>
-              <p className="mt-1 text-sm text-slate-500">
-                {nearestSubject?.name || "Môn học đã bị xóa"} ·{" "}
-                {formatDisplayDate(nearestDeadline.task.dueDate)}
-              </p>
-            </div>
-
-            <span className="inline-flex w-fit rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700">
-              {getDeadlineLabel(nearestDeadline.daysUntilDue)}
-            </span>
-          </div>
-        ) : (
-          <p className="mt-3 text-sm text-slate-500">
-            Không còn deadline chưa hoàn thành.
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <p className="text-3xl font-semibold tracking-tight text-amber-700">
+            {summary.upcomingTasks}
           </p>
-        )}
+          <p className="text-sm text-amber-700">
+            {summary.upcomingTasks > 0
+              ? "Deadline chưa hoàn thành trong 7 ngày tới."
+              : "Không có deadline nào trong 7 ngày tới."}
+          </p>
+        </div>
       </article>
     </section>
   );

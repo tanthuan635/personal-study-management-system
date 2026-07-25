@@ -1,4 +1,5 @@
-const REGISTERED_USER_KEY = "study-manager-registered-user";
+import { getToken } from "../utils/tokenStorage";
+
 const SESSION_USER_KEY = "study-manager-session-user";
 
 function readJson(key) {
@@ -22,24 +23,15 @@ function writeJson(key, value) {
   window.localStorage.setItem(key, JSON.stringify(value));
 }
 
-export function normalizeEmail(email) {
-  return email.trim().toLowerCase();
-}
-
-export function getRegisteredUser() {
-  return readJson(REGISTERED_USER_KEY);
-}
-
-export function saveRegisteredUser(user) {
-  writeJson(REGISTERED_USER_KEY, user);
-}
-
 export function getSessionUser() {
   return readJson(SESSION_USER_KEY);
 }
 
 export function saveSessionUser(user) {
-  writeJson(SESSION_USER_KEY, user);
+  writeJson(SESSION_USER_KEY, {
+    ...user,
+    fullName: user.fullName || user.name || "",
+  });
 }
 
 export function clearSessionUser() {
@@ -51,5 +43,5 @@ export function clearSessionUser() {
 }
 
 export function isAuthenticated() {
-  return Boolean(getSessionUser());
+  return Boolean(getToken() && getSessionUser());
 }

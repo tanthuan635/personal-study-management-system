@@ -12,10 +12,10 @@ import Schedule from "./pages/Schedule";
 import Statistics from "./pages/Statistics";
 import Subjects from "./pages/Subjects";
 import Tasks from "./pages/Tasks";
-import { getSessionUser } from "./lib/auth";
+import { isAuthenticated } from "./lib/auth";
 
 function HomeRedirect() {
-  return getSessionUser() ? (
+  return isAuthenticated() ? (
     <Navigate to="/dashboard" replace />
   ) : (
     <Navigate to="/login" replace />

@@ -1,13 +1,27 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+import { login } from "../../api/authApi";
 import AuthButton from "../../components/auth/AuthButton";
 import AuthInput from "../../components/auth/AuthInput";
-import {
-  getRegisteredUser,
-  normalizeEmail,
-  saveSessionUser,
-} from "../../lib/auth";
+import { saveSessionUser } from "../../lib/auth";
+import { setToken } from "../../utils/tokenStorage";
+
+function getLoginErrorMessage(error) {
+  if (error.message === "Invalid authentication response") {
+    return "Phản hồi đăng nhập từ máy chủ không hợp lệ.";
+  }
+
+  if (error.response?.status === 401) {
+    return "Email hoặc mật khẩu không đúng.";
+  }
+
+  if (!error.response) {
+    return "Không thể kết nối tới máy chủ. Vui lòng thử lại.";
+  }
+
+  return error.response.data?.message || "Đăng nhập thất bại. Vui lòng thử lại.";
+}
 
 function Login() {
   const navigate = useNavigate();
@@ -15,10 +29,11 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const message = location.state?.message || "";
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
 
@@ -29,30 +44,27 @@ function Login() {
       return;
     }
 
-    const registeredUser = getRegisteredUser();
+    setIsLoading(true);
 
-    if (registeredUser) {
-      const isValid =
-        normalizeEmail(registeredUser.email) === normalizeEmail(trimmedEmail) &&
-        registeredUser.password === password;
+    try {
+      const response = await login({
+        email: trimmedEmail,
+        password,
+      });
+      const { token, user } = response.data;
 
-      if (!isValid) {
-        setError("Email hoặc mật khẩu không đúng.");
-        return;
+      if (!token || !user) {
+        throw new Error("Invalid authentication response");
       }
 
-      saveSessionUser({
-        fullName: registeredUser.fullName,
-        email: registeredUser.email,
-      });
-    } else {
-      saveSessionUser({
-        fullName: trimmedEmail.split("@")[0],
-        email: trimmedEmail,
-      });
+      setToken(token);
+      saveSessionUser(user);
+      navigate("/dashboard", { replace: true });
+    } catch (requestError) {
+      setError(getLoginErrorMessage(requestError));
+    } finally {
+      setIsLoading(false);
     }
-
-    navigate("/dashboard", { replace: true });
   };
 
   return (
@@ -73,7 +85,10 @@ function Login() {
       ) : null}
 
       {error ? (
-        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div
+          role="alert"
+          className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
           {error}
         </div>
       ) : null}
@@ -87,6 +102,7 @@ function Login() {
           onChange={(event) => setEmail(event.target.value)}
           placeholder="tenban@example.com"
           autoComplete="email"
+          disabled={isLoading}
         />
 
         <AuthInput
@@ -97,9 +113,12 @@ function Login() {
           onChange={(event) => setPassword(event.target.value)}
           placeholder="Nhập mật khẩu"
           autoComplete="current-password"
+          disabled={isLoading}
         />
 
-        <AuthButton type="submit">Đăng nhập</AuthButton>
+        <AuthButton type="submit" disabled={isLoading}>
+          {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
+        </AuthButton>
       </form>
 
       <p className="mt-4 text-sm text-slate-600">

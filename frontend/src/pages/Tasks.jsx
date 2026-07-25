@@ -1,27 +1,96 @@
 import { useEffect, useMemo, useState } from "react";
 
+import { getSubjects } from "../api/subjectApi";
+import {
+  createTask,
+  deleteTask,
+  getTasks,
+  updateTask,
+  updateTaskStatus,
+} from "../api/taskApi";
 import TaskFilter from "../components/tasks/TaskFilter";
 import TaskForm from "../components/tasks/TaskForm";
 import TaskList from "../components/tasks/TaskList";
-import {
-  getNextTaskId,
-  getTaskDeadlineState,
-  loadSubjects,
-  loadTasks,
-  saveTasks,
-} from "../utils/storage";
+import { getTaskDeadlineState } from "../utils/storage";
+
+function getRequestErrorMessage(error, fallbackMessage) {
+  if (error.response?.status === 401) {
+    return "Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.";
+  }
+
+  if (!error.response) {
+    return "Không thể kết nối tới máy chủ. Vui lòng thử lại.";
+  }
+
+  return error.response.data?.message || fallbackMessage;
+}
+
+function normalizeTask(task) {
+  return {
+    ...task,
+    dueDate: task.dueDate ? String(task.dueDate).slice(0, 10) : "",
+  };
+}
+
+function sortTasksByDueDate(tasks) {
+  return [...tasks].sort((firstTask, secondTask) =>
+    firstTask.dueDate.localeCompare(secondTask.dueDate),
+  );
+}
 
 function Tasks() {
-  const [tasks, setTasks] = useState(() => loadTasks());
-  const [subjects] = useState(() => loadSubjects());
+  const [tasks, setTasks] = useState([]);
+  const [subjects, setSubjects] = useState([]);
   const [statusFilter, setStatusFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("");
   const [editingTask, setEditingTask] = useState(null);
   const [activeFormMode, setActiveFormMode] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deletingTaskId, setDeletingTaskId] = useState(null);
+  const [updatingStatusTaskId, setUpdatingStatusTaskId] = useState(null);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
-    saveTasks(tasks);
-  }, [tasks]);
+    let isActive = true;
+
+    async function loadTaskPageData() {
+      setIsLoading(true);
+      setError("");
+
+      try {
+        const [taskResponse, subjectResponse] = await Promise.all([
+          getTasks(),
+          getSubjects(),
+        ]);
+
+        if (isActive) {
+          setTasks((taskResponse.data.data || []).map(normalizeTask));
+          setSubjects(subjectResponse.data.data || []);
+        }
+      } catch (requestError) {
+        if (isActive) {
+          setError(
+            getRequestErrorMessage(
+              requestError,
+              "Không thể tải dữ liệu deadline.",
+            ),
+          );
+        }
+      } finally {
+        if (isActive) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadTaskPageData();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
@@ -60,6 +129,13 @@ function Tasks() {
   const addButtonLabel = activeFormMode === "add" ? "Đóng form" : "Thêm deadline";
 
   const openAddForm = () => {
+    if (isSubmitting) {
+      return;
+    }
+
+    setError("");
+    setMessage("");
+
     if (activeFormMode === "add") {
       setActiveFormMode(null);
       setEditingTask(null);
@@ -71,63 +147,127 @@ function Tasks() {
   };
 
   const closeForm = () => {
+    if (isSubmitting) {
+      return;
+    }
+
     setEditingTask(null);
     setActiveFormMode(null);
   };
 
-  const handleSubmit = (taskData) => {
-    if (activeFormMode === "edit" && editingTask) {
-      setTasks((currentTasks) =>
-        currentTasks.map((task) =>
-          task.id === editingTask.id ? { ...task, ...taskData } : task,
+  const handleSubmit = async (taskData) => {
+    setIsSubmitting(true);
+    setError("");
+    setMessage("");
+
+    try {
+      if (activeFormMode === "edit" && editingTask) {
+        const response = await updateTask(editingTask._id, taskData);
+        const updatedTask = normalizeTask(response.data.data);
+
+        setTasks((currentTasks) =>
+          sortTasksByDueDate(
+            currentTasks.map((task) =>
+              task._id === updatedTask._id ? updatedTask : task,
+            ),
+          ),
+        );
+        setMessage("Cập nhật deadline thành công.");
+      } else {
+        const response = await createTask(taskData);
+        const createdTask = normalizeTask(response.data.data);
+
+        setTasks((currentTasks) =>
+          sortTasksByDueDate([...currentTasks, createdTask]),
+        );
+        setMessage("Thêm deadline thành công.");
+      }
+
+      setEditingTask(null);
+      setActiveFormMode(null);
+    } catch (requestError) {
+      setError(
+        getRequestErrorMessage(
+          requestError,
+          activeFormMode === "edit"
+            ? "Không thể cập nhật deadline."
+            : "Không thể thêm deadline.",
         ),
       );
-      closeForm();
-      return;
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setTasks((currentTasks) => {
-      const nextTask = {
-        id: getNextTaskId(currentTasks),
-        ...taskData,
-      };
-
-      return [...currentTasks, nextTask];
-    });
-
-    closeForm();
   };
 
   const handleEdit = (task) => {
+    setError("");
+    setMessage("");
     setEditingTask(task);
     setActiveFormMode("edit");
   };
 
-  const handleDelete = (taskId) => {
+  const handleDelete = async (taskId) => {
     const shouldDelete = window.confirm("Bạn có muốn xóa deadline này không?");
 
     if (!shouldDelete) {
       return;
     }
 
-    setTasks((currentTasks) =>
-      currentTasks.filter((task) => task.id !== taskId),
-    );
+    setDeletingTaskId(taskId);
+    setError("");
+    setMessage("");
 
-    if (editingTask?.id === taskId) {
-      closeForm();
+    try {
+      await deleteTask(taskId);
+      setTasks((currentTasks) =>
+        currentTasks.filter((task) => task._id !== taskId),
+      );
+
+      if (editingTask?._id === taskId) {
+        setEditingTask(null);
+        setActiveFormMode(null);
+      }
+
+      setMessage("Xóa deadline thành công.");
+    } catch (requestError) {
+      setError(
+        getRequestErrorMessage(requestError, "Không thể xóa deadline."),
+      );
+    } finally {
+      setDeletingTaskId(null);
     }
   };
 
-  const handleToggleComplete = (taskId) => {
-    setTasks((currentTasks) =>
-      currentTasks.map((task) =>
-        task.id === taskId ? { ...task, status: "Hoàn thành" } : task,
-      ),
-    );
+  const handleToggleComplete = async (taskId) => {
+    setUpdatingStatusTaskId(taskId);
+    setError("");
+    setMessage("");
 
-    if (editingTask?.id === taskId) {
-      closeForm();
+    try {
+      const response = await updateTaskStatus(taskId, "Hoàn thành");
+      const updatedTask = normalizeTask(response.data.data);
+
+      setTasks((currentTasks) =>
+        currentTasks.map((task) =>
+          task._id === updatedTask._id ? updatedTask : task,
+        ),
+      );
+
+      if (editingTask?._id === taskId) {
+        setEditingTask(null);
+        setActiveFormMode(null);
+      }
+
+      setMessage("Đã đánh dấu deadline hoàn thành.");
+    } catch (requestError) {
+      setError(
+        getRequestErrorMessage(
+          requestError,
+          "Không thể cập nhật trạng thái deadline.",
+        ),
+      );
+    } finally {
+      setUpdatingStatusTaskId(null);
     }
   };
 
@@ -144,8 +284,8 @@ function Tasks() {
             Danh sách deadline
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-            Thêm, sửa, xóa, lọc và đánh dấu hoàn thành deadline. Dữ liệu được lưu
-            tạm vào localStorage.
+            Thêm, sửa, xóa, lọc và đánh dấu hoàn thành deadline trong tài khoản
+            của bạn.
           </p>
         </div>
 
@@ -153,12 +293,28 @@ function Tasks() {
           <button
             type="button"
             onClick={openAddForm}
-            className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+            disabled={isLoading || isSubmitting}
+            className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
           >
             {addButtonLabel}
           </button>
         </div>
       </section>
+
+      {message ? (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          {message}
+        </div>
+      ) : null}
+
+      {error ? (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          {error}
+        </div>
+      ) : null}
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
@@ -200,12 +356,13 @@ function Tasks() {
 
       {isFormVisible ? (
         <TaskForm
-          key={editingTask ? `edit-${editingTask.id}` : "add-task"}
+          key={editingTask ? `edit-${editingTask._id}` : "add-task"}
           mode={activeFormMode === "edit" ? "edit" : "add"}
           initialTask={editingTask}
           subjects={subjects}
           onSubmit={handleSubmit}
           onCancel={closeForm}
+          isSubmitting={isSubmitting}
         />
       ) : (
         <section className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center shadow-sm">
@@ -213,7 +370,8 @@ function Tasks() {
             Chưa mở form thêm deadline
           </p>
           <p className="mt-2 text-sm leading-6 text-slate-500">
-            Nhấn nút <span className="font-medium text-slate-700">Thêm deadline</span> để tạo deadline mới.
+            Nhấn nút <span className="font-medium text-slate-700">Thêm deadline</span>{" "}
+            để tạo deadline mới.
           </p>
         </section>
       )}
@@ -230,14 +388,24 @@ function Tasks() {
           </div>
         </div>
 
-        <TaskList
-          tasks={filteredTasks}
-          subjects={subjects}
-          hasActiveFilters={hasActiveFilters}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onToggleComplete={handleToggleComplete}
-        />
+        {isLoading ? (
+          <div className="rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center shadow-sm">
+            <p className="text-base font-medium text-slate-700">
+              Đang tải danh sách deadline...
+            </p>
+          </div>
+        ) : (
+          <TaskList
+            tasks={filteredTasks}
+            subjects={subjects}
+            hasActiveFilters={hasActiveFilters}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onToggleComplete={handleToggleComplete}
+            deletingTaskId={deletingTaskId}
+            updatingStatusTaskId={updatingStatusTaskId}
+          />
+        )}
       </section>
     </div>
   );

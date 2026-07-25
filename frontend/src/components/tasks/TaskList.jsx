@@ -9,9 +9,11 @@ function TaskList({
   onEdit,
   onDelete,
   onToggleComplete,
+  deletingTaskId,
+  updatingStatusTaskId,
 }) {
   const subjectMap = useMemo(() => {
-    return new Map(subjects.map((subject) => [Number(subject.id), subject]));
+    return new Map(subjects.map((subject) => [String(subject._id), subject]));
   }, [subjects]);
 
   if (tasks.length === 0) {
@@ -35,12 +37,14 @@ function TaskList({
     <div className="grid gap-4 xl:grid-cols-2">
       {tasks.map((task) => (
         <TaskCard
-          key={task.id}
+          key={task._id}
           task={task}
-          subject={subjectMap.get(Number(task.subjectId))}
+          subject={subjectMap.get(String(task.subject))}
           onEdit={onEdit}
           onDelete={onDelete}
           onToggleComplete={onToggleComplete}
+          isDeleting={deletingTaskId === task._id}
+          isUpdatingStatus={updatingStatusTaskId === task._id}
         />
       ))}
     </div>

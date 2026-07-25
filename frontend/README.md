@@ -1,22 +1,31 @@
 # Study Manager Frontend
 
-Frontend React Vite cho ứng dụng quản lý học tập cá nhân.
+Frontend React Vite cho ứng dụng Study Manager. Dữ liệu nghiệp vụ được lấy từ
+backend API; `localStorage` chỉ lưu token và thông tin phiên đăng nhập.
 
-## Chạy dự án
+## Cấu hình
+
+Tạo `.env` từ `.env.example` khi backend không chạy ở địa chỉ mặc định:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+## Cài đặt và chạy
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Build kiểm tra
+Backend và MongoDB cần được khởi động trước để đăng nhập và thao tác dữ liệu.
+
+## Kiểm tra
 
 ```bash
+npm run lint
 npm run build
 ```
 
-## Ghi chú
-
-- Dữ liệu hiện được lưu tạm bằng `localStorage`.
-- Chưa có backend và chưa gọi API thật trong branch frontend hiện tại.
-- Các trang chính gồm Dashboard, Môn học, Deadline, Lịch học, Tài liệu và Thống kê.
+Các trang chính gồm Dashboard, Môn học, Deadline, Lịch học, Tài liệu và Thống
+kê. Hướng dẫn cài đặt đầy đủ nằm tại [README gốc](../README.md).

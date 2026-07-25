@@ -2,9 +2,16 @@ import { useMemo } from "react";
 
 import DocumentCard from "./DocumentCard";
 
-function DocumentList({ documents, subjects, hasActiveFilters, onDelete }) {
+function DocumentList({
+  documents,
+  subjects,
+  hasActiveFilters,
+  onEdit,
+  onDelete,
+  deletingDocumentId,
+}) {
   const subjectMap = useMemo(() => {
-    return new Map(subjects.map((subject) => [Number(subject.id), subject]));
+    return new Map(subjects.map((subject) => [String(subject._id), subject]));
   }, [subjects]);
 
   if (documents.length === 0) {
@@ -28,10 +35,12 @@ function DocumentList({ documents, subjects, hasActiveFilters, onDelete }) {
     <div className="grid gap-4 lg:grid-cols-2">
       {documents.map((documentItem) => (
         <DocumentCard
-          key={documentItem.id}
+          key={documentItem._id}
           documentItem={documentItem}
-          subject={subjectMap.get(Number(documentItem.subjectId))}
+          subject={subjectMap.get(String(documentItem.subject))}
+          onEdit={onEdit}
           onDelete={onDelete}
+          isDeleting={deletingDocumentId === documentItem._id}
         />
       ))}
     </div>

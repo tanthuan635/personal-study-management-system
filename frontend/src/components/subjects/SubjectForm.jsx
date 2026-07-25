@@ -24,7 +24,13 @@ function getFormValue(initialSubject) {
   };
 }
 
-function SubjectForm({ mode = "add", initialSubject, onSubmit, onCancel }) {
+function SubjectForm({
+  mode = "add",
+  initialSubject,
+  onSubmit,
+  onCancel,
+  isSubmitting = false,
+}) {
   const [formData, setFormData] = useState(() => getFormValue(initialSubject));
   const isEditing = mode === "edit";
 
@@ -52,10 +58,6 @@ function SubjectForm({ mode = "add", initialSubject, onSubmit, onCancel }) {
     }
 
     onSubmit(payload);
-
-    if (!isEditing) {
-      setFormData(getEmptyForm());
-    }
   };
 
   return (
@@ -79,6 +81,7 @@ function SubjectForm({ mode = "add", initialSubject, onSubmit, onCancel }) {
             name="name"
             value={formData.name}
             onChange={handleChange}
+            disabled={isSubmitting}
             placeholder="Lập trình Web"
             className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
           />
@@ -93,6 +96,7 @@ function SubjectForm({ mode = "add", initialSubject, onSubmit, onCancel }) {
             name="code"
             value={formData.code}
             onChange={handleChange}
+            disabled={isSubmitting}
             placeholder="WEB101"
             className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
           />
@@ -110,6 +114,7 @@ function SubjectForm({ mode = "add", initialSubject, onSubmit, onCancel }) {
             name="teacher"
             value={formData.teacher}
             onChange={handleChange}
+            disabled={isSubmitting}
             placeholder="Nguyễn Văn A"
             className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
           />
@@ -126,6 +131,7 @@ function SubjectForm({ mode = "add", initialSubject, onSubmit, onCancel }) {
             min="1"
             value={formData.credits}
             onChange={handleChange}
+            disabled={isSubmitting}
             placeholder="3"
             className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
           />
@@ -144,6 +150,7 @@ function SubjectForm({ mode = "add", initialSubject, onSubmit, onCancel }) {
             rows="4"
             value={formData.description}
             onChange={handleChange}
+            disabled={isSubmitting}
             placeholder="Môn học về lập trình giao diện web"
             className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
           />
@@ -152,16 +159,22 @@ function SubjectForm({ mode = "add", initialSubject, onSubmit, onCancel }) {
         <div className="flex gap-3">
           <button
             type="submit"
-            className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+            disabled={isSubmitting}
+            className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
           >
-            {isEditing ? "Lưu thay đổi" : "Thêm môn học"}
+            {isSubmitting
+              ? "Đang lưu..."
+              : isEditing
+                ? "Lưu thay đổi"
+                : "Thêm môn học"}
           </button>
 
           {onCancel ? (
             <button
               type="button"
               onClick={onCancel}
-              className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+              disabled={isSubmitting}
+              className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isEditing ? "Hủy" : "Đóng"}
             </button>

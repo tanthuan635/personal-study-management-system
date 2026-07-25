@@ -6,9 +6,15 @@ import {
 } from "../../utils/storage";
 import ScheduleCard from "./ScheduleCard";
 
-function ScheduleTable({ schedules, subjects, onEdit, onDelete }) {
+function ScheduleTable({
+  schedules,
+  subjects,
+  onEdit,
+  onDelete,
+  deletingScheduleId,
+}) {
   const subjectMap = useMemo(() => {
-    return new Map(subjects.map((subject) => [Number(subject.id), subject]));
+    return new Map(subjects.map((subject) => [String(subject._id), subject]));
   }, [subjects]);
 
   const schedulesByDay = useMemo(() => {
@@ -57,11 +63,12 @@ function ScheduleTable({ schedules, subjects, onEdit, onDelete }) {
                   {schedulesByDay[day].length > 0 ? (
                     schedulesByDay[day].map((schedule) => (
                       <ScheduleCard
-                        key={schedule.id}
+                        key={schedule._id}
                         schedule={schedule}
-                        subject={subjectMap.get(Number(schedule.subjectId))}
+                        subject={subjectMap.get(String(schedule.subject))}
                         onEdit={onEdit}
                         onDelete={onDelete}
+                        isDeleting={deletingScheduleId === schedule._id}
                       />
                     ))
                   ) : (

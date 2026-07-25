@@ -7,13 +7,13 @@ import {
 } from "../../utils/storage";
 
 function getDefaultSubjectId(subjects) {
-  return subjects.length > 0 ? String(subjects[0].id) : "";
+  return subjects.length > 0 ? String(subjects[0]._id) : "";
 }
 
 function getFormValue(initialSchedule, subjects) {
   if (!initialSchedule) {
     return {
-      subjectId: getDefaultSubjectId(subjects),
+      subject: getDefaultSubjectId(subjects),
       dayOfWeek: SCHEDULE_DAY_OPTIONS[0],
       startPeriod: "1",
       endPeriod: "1",
@@ -23,10 +23,12 @@ function getFormValue(initialSchedule, subjects) {
   }
 
   return {
-    subjectId: String(initialSchedule.subjectId ?? getDefaultSubjectId(subjects)),
+    subject: String(initialSchedule.subject ?? getDefaultSubjectId(subjects)),
     dayOfWeek: initialSchedule.dayOfWeek || SCHEDULE_DAY_OPTIONS[0],
     startPeriod: String(initialSchedule.startPeriod || 1),
-    endPeriod: String(initialSchedule.endPeriod || initialSchedule.startPeriod || 1),
+    endPeriod: String(
+      initialSchedule.endPeriod || initialSchedule.startPeriod || 1,
+    ),
     room: initialSchedule.room || "",
     note: initialSchedule.note || "",
   };
@@ -38,6 +40,7 @@ function ScheduleForm({
   subjects,
   onSubmit,
   onCancel,
+  isSubmitting = false,
 }) {
   const [formData, setFormData] = useState(() =>
     getFormValue(initialSchedule, subjects),
@@ -45,8 +48,8 @@ function ScheduleForm({
   const isEditing = mode === "edit";
 
   const selectedSubjectExists = useMemo(() => {
-    return subjects.some((subject) => String(subject.id) === formData.subjectId);
-  }, [formData.subjectId, subjects]);
+    return subjects.some((subject) => String(subject._id) === formData.subject);
+  }, [formData.subject, subjects]);
 
   const availableEndPeriods = useMemo(() => {
     const startPeriod = Number(formData.startPeriod) || 1;
@@ -54,10 +57,12 @@ function ScheduleForm({
     return SCHEDULE_PERIOD_OPTIONS.filter((period) => period >= startPeriod);
   }, [formData.startPeriod]);
 
-  const hasValidPeriodRange = Number(formData.endPeriod) >= Number(formData.startPeriod);
+  const hasValidPeriodRange =
+    Number(formData.endPeriod) >= Number(formData.startPeriod);
 
   const isFormValid = Boolean(
-    formData.subjectId &&
+    formData.subject &&
+      selectedSubjectExists &&
       formData.dayOfWeek &&
       formData.startPeriod &&
       formData.endPeriod &&
@@ -65,7 +70,10 @@ function ScheduleForm({
       formData.room.trim(),
   );
 
-  const timePreview = getPeriodTimeRange(formData.startPeriod, formData.endPeriod);
+  const timePreview = getPeriodTimeRange(
+    formData.startPeriod,
+    formData.endPeriod,
+  );
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -78,7 +86,8 @@ function ScheduleForm({
         return {
           ...current,
           startPeriod: value,
-          endPeriod: currentEndPeriod < nextStartPeriod ? value : current.endPeriod,
+          endPeriod:
+            currentEndPeriod < nextStartPeriod ? value : current.endPeriod,
         };
       }
 
@@ -92,22 +101,18 @@ function ScheduleForm({
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (!isFormValid) {
+    if (!isFormValid || isSubmitting) {
       return;
     }
 
     onSubmit({
-      subjectId: Number(formData.subjectId),
+      subject: formData.subject,
       dayOfWeek: formData.dayOfWeek,
       startPeriod: Number(formData.startPeriod),
       endPeriod: Number(formData.endPeriod),
       room: formData.room.trim(),
       note: formData.note.trim(),
     });
-
-    if (!isEditing) {
-      setFormData(getFormValue(null, subjects));
-    }
   };
 
   return (
@@ -138,19 +143,20 @@ function ScheduleForm({
             </label>
             <select
               id="schedule-subject"
-              name="subjectId"
-              value={formData.subjectId}
+              name="subject"
+              value={formData.subject}
               onChange={handleChange}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
+              disabled={isSubmitting}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-100 disabled:cursor-not-allowed disabled:bg-slate-100"
             >
               <option value="">Chọn môn học</option>
-              {!selectedSubjectExists && formData.subjectId ? (
-                <option value={formData.subjectId}>
-                  Môn đã bị xóa (#{formData.subjectId})
+              {!selectedSubjectExists && formData.subject ? (
+                <option value={formData.subject}>
+                  Môn đã bị xóa (#{formData.subject})
                 </option>
               ) : null}
               {subjects.map((subject) => (
-                <option key={subject.id} value={subject.id}>
+                <option key={subject._id} value={subject._id}>
                   {subject.code} - {subject.name}
                 </option>
               ))}
@@ -169,7 +175,8 @@ function ScheduleForm({
               name="dayOfWeek"
               value={formData.dayOfWeek}
               onChange={handleChange}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
+              disabled={isSubmitting}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-100 disabled:cursor-not-allowed disabled:bg-slate-100"
             >
               {SCHEDULE_DAY_OPTIONS.map((day) => (
                 <option key={day} value={day}>
@@ -193,7 +200,8 @@ function ScheduleForm({
               name="startPeriod"
               value={formData.startPeriod}
               onChange={handleChange}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
+              disabled={isSubmitting}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-100 disabled:cursor-not-allowed disabled:bg-slate-100"
             >
               {SCHEDULE_PERIOD_OPTIONS.map((period) => (
                 <option key={period} value={period}>
@@ -215,7 +223,8 @@ function ScheduleForm({
               name="endPeriod"
               value={formData.endPeriod}
               onChange={handleChange}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
+              disabled={isSubmitting}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-100 disabled:cursor-not-allowed disabled:bg-slate-100"
             >
               {availableEndPeriods.map((period) => (
                 <option key={period} value={period}>
@@ -237,8 +246,9 @@ function ScheduleForm({
               name="room"
               value={formData.room}
               onChange={handleChange}
+              disabled={isSubmitting}
               placeholder="A101"
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100 disabled:cursor-not-allowed disabled:bg-slate-100"
             />
           </div>
         </div>
@@ -260,8 +270,9 @@ function ScheduleForm({
             rows="3"
             value={formData.note}
             onChange={handleChange}
+            disabled={isSubmitting}
             placeholder="Học lý thuyết"
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
+            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100 disabled:cursor-not-allowed disabled:bg-slate-100"
           />
         </div>
 
@@ -274,17 +285,22 @@ function ScheduleForm({
         <div className="flex gap-3">
           <button
             type="submit"
-            disabled={!isFormValid}
+            disabled={!isFormValid || isSubmitting}
             className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-slate-900"
           >
-            {isEditing ? "Lưu thay đổi" : "Thêm lịch học"}
+            {isSubmitting
+              ? "Đang lưu..."
+              : isEditing
+                ? "Lưu thay đổi"
+                : "Thêm lịch học"}
           </button>
 
           {onCancel ? (
             <button
               type="button"
               onClick={onCancel}
-              className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+              disabled={isSubmitting}
+              className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isEditing ? "Hủy" : "Đóng"}
             </button>

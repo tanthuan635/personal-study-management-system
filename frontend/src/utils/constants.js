@@ -70,7 +70,21 @@ export const DEFAULT_SCHEDULES = [
 
 export const DOCUMENTS_STORAGE_KEY = "study-manager-documents";
 
-export const DOCUMENT_TYPE_OPTIONS = ["PDF", "DOCX", "PPTX", "Video", "Link", "Khác"];
+export const DOCUMENT_TYPE_OPTIONS = [
+  "PDF",
+  "DOC",
+  "DOCX",
+  "PPT",
+  "PPTX",
+  "JPG",
+  "JPEG",
+  "PNG",
+  "GIF",
+  "WEBP",
+  "Video",
+  "Link",
+  "Khác",
+];
 
 export const DEFAULT_DOCUMENTS = [
   {
