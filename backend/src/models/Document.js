@@ -31,6 +31,11 @@ const documentSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    storedFileName: {
+      type: String,
+      default: "",
+      select: false,
+    },
     description: {
       type: String,
       trim: true,
@@ -41,5 +46,12 @@ const documentSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+documentSchema.set("toJSON", {
+  transform(document, returnedDocument) {
+    delete returnedDocument.storedFileName;
+    return returnedDocument;
+  },
+});
 
 module.exports = mongoose.model("Document", documentSchema);
