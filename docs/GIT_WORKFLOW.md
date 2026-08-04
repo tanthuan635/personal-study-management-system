@@ -87,7 +87,7 @@ npm run dev
 ```
 
 ```text
-GET http://localhost:5000/api/health
+GET http://localhost:5050/api/health
 ```
 
 ## 6. Push và tạo Pull Request

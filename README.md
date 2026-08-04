@@ -24,7 +24,7 @@ npm run install:all
 Tạo `backend/.env` từ `backend/.env.example`:
 
 ```env
-PORT=5000
+PORT=5050
 MONGO_URI=mongodb://127.0.0.1:27017/study-manager
 JWT_SECRET=replace_with_a_long_random_secret
 ```
@@ -34,11 +34,11 @@ Không commit file `.env`. Nếu dùng MongoDB Compass, URI local ở trên có 
 
 ## Cấu hình frontend
 
-Frontend mặc định gọi `http://localhost:5000/api`. Khi cần cấu hình riêng, tạo
+Frontend mặc định gọi `http://localhost:5050/api`. Khi cần cấu hình riêng, tạo
 `frontend/.env` từ `frontend/.env.example`:
 
 ```env
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:5050/api
 ```
 
 ## Chạy project
@@ -59,7 +59,7 @@ npm run dev:frontend
 ```
 
 Mở địa chỉ Vite in ra terminal, thường là `http://localhost:5173`. API health
-check ở `http://localhost:5000/api/health`.
+check ở `http://localhost:5050/api/health`.
 
 ## Luồng demo
 
