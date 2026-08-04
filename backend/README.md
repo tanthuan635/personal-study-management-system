@@ -25,7 +25,7 @@ npm start
 Tạo file `.env` từ `.env.example` trước khi chạy:
 
 ```env
-PORT=5000
+PORT=5050
 MONGO_URI=mongodb://127.0.0.1:27017/study-manager
 JWT_SECRET=replace_with_a_long_random_secret
 ```
@@ -54,7 +54,7 @@ Endpoint `POST /api/documents` tiếp tục nhận JSON để lưu metadata như
 `file`:
 
 ```bash
-curl -X POST http://localhost:5000/api/documents \
+curl -X POST http://localhost:5050/api/documents \
   -H "Authorization: Bearer <token>" \
   -F "title=Slide React" \
   -F "subject=<subject_id>" \
@@ -65,6 +65,6 @@ curl -X POST http://localhost:5000/api/documents \
 Định dạng được phép: PDF, DOC, DOCX, PPT, PPTX, JPG, JPEG, PNG, GIF và
 WEBP. Dung lượng tối đa là 10MB. Response trả `fileUrl` dạng
 `/uploads/<stored_file_name>`; có thể mở file tại
-`http://localhost:5000<fileUrl>`.
+`http://localhost:5050<fileUrl>`.
 
 Hướng dẫn cài đặt và luồng demo đầy đủ nằm tại [README gốc](../README.md).

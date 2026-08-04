@@ -8,7 +8,7 @@ backend API; `localStorage` chỉ lưu token và thông tin phiên đăng nhập
 Tạo `.env` từ `.env.example` khi backend không chạy ở địa chỉ mặc định:
 
 ```env
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:5050/api
 ```
 
 ## Cài đặt và chạy

@@ -69,17 +69,23 @@ function Login() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
+      <div className="mb-7">
+        <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-[#4f8edc]">
+          Chào mừng trở lại
+        </p>
+        <h2 className="text-3xl font-bold tracking-[-0.035em] text-slate-950">
           Đăng nhập
         </h2>
-        <p className="mt-2 text-sm leading-6 text-slate-500">
-          Nhập email và mật khẩu để vào trang quản lý học tập.
+        <p className="mt-3 text-sm leading-6 text-slate-500">
+          Tiếp tục quản lý kế hoạch và tiến độ học tập của bạn.
         </p>
       </div>
 
       {message ? (
-        <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+        <div
+          role="status"
+          className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-700"
+        >
           {message}
         </div>
       ) : null}
@@ -87,13 +93,13 @@ function Login() {
       {error ? (
         <div
           role="alert"
-          className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          className="mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
         >
           {error}
         </div>
       ) : null}
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
+      <form className="space-y-5" onSubmit={handleSubmit}>
         <AuthInput
           label="Email"
           id="login-email"
@@ -117,17 +123,48 @@ function Login() {
         />
 
         <AuthButton type="submit" disabled={isLoading}>
-          {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
+          {isLoading ? (
+            <>
+              <span className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+              Đang đăng nhập...
+            </>
+          ) : (
+            <>
+              Đăng nhập
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+                className="size-4"
+              >
+                <path
+                  d="M4 10h12m-5-5 5 5-5 5"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </>
+          )}
         </AuthButton>
       </form>
 
-      <p className="mt-4 text-sm text-slate-600">
+      <div className="my-7 flex items-center gap-3" aria-hidden="true">
+        <span className="h-px flex-1 bg-slate-200" />
+        <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
+          Tài khoản mới
+        </span>
+        <span className="h-px flex-1 bg-slate-200" />
+      </div>
+
+      <p className="text-center text-sm text-slate-600">
         Chưa có tài khoản?{" "}
         <Link
           to="/register"
-          className="font-medium text-slate-900 underline underline-offset-4"
+          className="font-bold text-[#4f8edc] transition hover:text-[#3979c2] hover:underline hover:underline-offset-4"
         >
-          Đăng ký
+          Đăng ký ngay
         </Link>
       </p>
     </div>

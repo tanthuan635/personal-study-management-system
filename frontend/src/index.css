@@ -8,10 +8,237 @@ body,
 
 body {
   margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+  font-family:
+    "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial,
     sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   background: #f8fafc;
   color: #0f172a;
+}
+
+.brand-name {
+  font-family:
+    "Segoe UI Variable Display", "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.sidebar-collapse-text {
+  transform-origin: left center;
+  will-change: max-width, opacity, filter;
+  transition:
+    max-width 300ms ease-in-out,
+    opacity 120ms ease-out,
+    filter 120ms ease-out;
+}
+
+.schedule-calendar {
+  --fc-border-color: #dbeafe;
+  --fc-button-bg-color: #4f8edc;
+  --fc-button-border-color: #4f8edc;
+  --fc-button-hover-bg-color: #4383ce;
+  --fc-button-hover-border-color: #4383ce;
+  --fc-button-active-bg-color: #3979c2;
+  --fc-button-active-border-color: #3979c2;
+  --fc-neutral-bg-color: #f7fbff;
+  --fc-page-bg-color: #ffffff;
+  --fc-today-bg-color: #eff6ff;
+  --fc-now-indicator-color: #ef4444;
+}
+
+.schedule-calendar .fc {
+  color: #334155;
+  font-family: inherit;
+  font-size: 0.875rem;
+}
+
+.schedule-calendar .fc .fc-toolbar {
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.schedule-calendar .fc .fc-toolbar-title {
+  color: #0f172a;
+  font-size: 1.125rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.schedule-calendar .fc .fc-button {
+  border-radius: 0.75rem;
+  box-shadow: none;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 0.55rem 0.8rem;
+  text-transform: none;
+}
+
+.schedule-calendar .fc .fc-button:focus {
+  box-shadow: 0 0 0 4px rgb(219 234 254 / 70%);
+}
+
+.schedule-calendar .fc .fc-scrollgrid {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.schedule-calendar .fc .fc-col-header-cell {
+  background: #f4f9ff;
+}
+
+.schedule-calendar .fc .fc-col-header-cell-cushion {
+  color: #334155;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.85rem 0.35rem;
+  text-decoration: none;
+  text-transform: capitalize;
+}
+
+.schedule-calendar .fc .fc-timegrid-axis-cushion,
+.schedule-calendar .fc .fc-timegrid-slot-label-cushion {
+  color: #94a3b8;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.schedule-calendar .fc .fc-timegrid-slot {
+  height: 2.1rem;
+}
+
+.schedule-calendar .fc .fc-timegrid-now-indicator-arrow {
+  border-width: 5px 0 5px 6px;
+}
+
+.schedule-calendar .fc .fc-timegrid-event-harness {
+  margin: 1px 2px;
+}
+
+.schedule-calendar .fc .fc-timegrid-event {
+  border: 0;
+  border-radius: 0.65rem;
+  box-shadow: none;
+  cursor: pointer;
+  overflow: visible;
+}
+
+.schedule-calendar .fc .fc-event-main {
+  height: 100%;
+  padding: 0;
+}
+
+.schedule-calendar-event {
+  background: linear-gradient(135deg, #eaf4ff 0%, #dcecff 100%);
+  border: 1px solid #bfdbfe;
+  border-left: 3px solid #4f8edc;
+  border-radius: 0.65rem;
+  color: #0f172a;
+  display: flex;
+  gap: 0.25rem;
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  padding: 0.35rem 0.35rem 0.35rem 0.45rem;
+  transition:
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+
+.schedule-calendar-event:hover {
+  box-shadow: 0 8px 18px rgb(59 130 246 / 18%);
+  transform: translateY(-1px);
+}
+
+.schedule-calendar-event__content {
+  min-width: 0;
+  flex: 1;
+}
+
+.schedule-calendar-event__code,
+.schedule-calendar-event__title,
+.schedule-calendar-event__meta {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.schedule-calendar-event__code {
+  color: #3979c2;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.schedule-calendar-event__title {
+  color: #0f172a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.15rem;
+}
+
+.schedule-calendar-event__meta {
+  color: #64748b;
+  font-size: 0.62rem;
+  font-weight: 600;
+}
+
+.schedule-calendar-event__delete {
+  align-items: center;
+  align-self: flex-start;
+  background: rgb(255 255 255 / 75%);
+  border: 0;
+  border-radius: 0.4rem;
+  color: #e11d48;
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 auto;
+  height: 1.4rem;
+  justify-content: center;
+  opacity: 0;
+  padding: 0;
+  transition:
+    background-color 150ms ease,
+    opacity 150ms ease;
+  width: 1.4rem;
+}
+
+.schedule-calendar-event:hover .schedule-calendar-event__delete,
+.schedule-calendar-event__delete:focus-visible {
+  opacity: 1;
+}
+
+.schedule-calendar-event__delete:hover {
+  background: #ffe4e6;
+}
+
+.schedule-calendar-event__delete:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.schedule-calendar-event__delete svg {
+  height: 0.75rem;
+  width: 0.75rem;
+}
+
+.schedule-calendar-event__spinner {
+  animation: schedule-calendar-spin 700ms linear infinite;
+  border: 2px solid rgb(225 29 72 / 25%);
+  border-radius: 9999px;
+  border-top-color: #e11d48;
+  height: 0.75rem;
+  width: 0.75rem;
+}
+
+@keyframes schedule-calendar-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 * {

@@ -4,6 +4,10 @@ const path = require("path");
 const Document = require("../models/Document");
 const Subject = require("../models/Subject");
 const { removeUploadedFile } = require("../middleware/uploadMiddleware");
+const {
+  getOrCreateDocumentPreview,
+  removeDocumentPreview,
+} = require("../utils/documentPreview");
 
 const DOCUMENT_FIELDS = [
   "title",
@@ -174,6 +178,32 @@ async function getDocumentById(req, res) {
   }
 }
 
+async function getDocumentPreview(req, res) {
+  try {
+    const result = await findOwnedDocument(req.params.id, req.user._id);
+
+    if (result.status) {
+      return sendLookupError(res, result);
+    }
+
+    const previewPath = await getOrCreateDocumentPreview(
+      result.document.storedFileName,
+    );
+
+    res.type("application/pdf");
+    res.setHeader("Content-Disposition", "inline");
+    return res.sendFile(previewPath);
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message:
+        error.statusCode
+          ? error.message
+          : "Không thể tạo bản xem trước cho tài liệu Office.",
+    });
+  }
+}
+
 async function createDocument(req, res) {
   try {
     const payload = buildDocumentPayload(req.body);
@@ -284,7 +314,10 @@ async function deleteDocument(req, res) {
     }
 
     await result.document.deleteOne();
-    await removeUploadedFile(result.document.storedFileName);
+    await Promise.all([
+      removeUploadedFile(result.document.storedFileName),
+      removeDocumentPreview(result.document.storedFileName),
+    ]);
 
     return res.json({
       success: true,
@@ -301,6 +334,7 @@ async function deleteDocument(req, res) {
 module.exports = {
   getDocuments,
   getDocumentById,
+  getDocumentPreview,
   createDocument,
   updateDocument,
   deleteDocument,

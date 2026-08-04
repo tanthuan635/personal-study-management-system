@@ -12,14 +12,11 @@ deadline, lịch học, tài liệu và thống kê tiến độ.
 
 ## Cài đặt
 
-Clone project và cài dependency riêng cho backend, frontend:
+Từ thư mục gốc của project, cài dependency cho root, backend và frontend:
 
 ```bash
-cd backend
 npm install
-
-cd ../frontend
-npm install
+npm run install:all
 ```
 
 ## Cấu hình backend
@@ -46,20 +43,19 @@ VITE_API_URL=http://localhost:5000/api
 
 ## Chạy project
 
-Mở hai terminal tại thư mục project.
-
-Terminal backend:
+Sau khi MongoDB đã hoạt động và `backend/.env` đã được cấu hình, chạy từ thư
+mục gốc:
 
 ```bash
-cd backend
 npm run dev
 ```
 
-Terminal frontend:
+Lệnh này khởi động đồng thời backend và frontend. Nhấn `Ctrl+C` một lần để dừng
+cả hai. Khi cần debug riêng từng phần, dùng:
 
 ```bash
-cd frontend
-npm run dev
+npm run dev:backend
+npm run dev:frontend
 ```
 
 Mở địa chỉ Vite in ra terminal, thường là `http://localhost:5173`. API health

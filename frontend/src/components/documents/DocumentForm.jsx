@@ -71,6 +71,9 @@ function formatFileSize(size) {
   return `${(size / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+const inputClassName =
+  "w-full rounded-2xl border border-blue-100 bg-[#f7fbff] px-4 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-blue-200 focus:border-[#79b8f3] focus:bg-white focus:ring-4 focus:ring-blue-100/70 disabled:cursor-not-allowed disabled:bg-slate-100";
+
 function DocumentForm({
   mode = "add",
   initialDocument,
@@ -84,6 +87,7 @@ function DocumentForm({
   );
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileError, setFileError] = useState("");
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
   const fileInputRef = useRef(null);
   const isEditing = mode === "edit";
 
@@ -94,9 +98,10 @@ function DocumentForm({
   const hasValidSource = selectedFile
     ? !fileError
     : Boolean(formData.fileName.trim() && formData.fileType);
+  const automaticTitle = selectedFile?.name || formData.fileName.trim();
 
   const isFormValid = Boolean(
-    formData.title.trim() &&
+    (isEditing ? formData.title.trim() : automaticTitle) &&
       formData.subject &&
       selectedSubjectExists &&
       hasValidSource,
@@ -111,9 +116,7 @@ function DocumentForm({
     }));
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files?.[0] || null;
-
+  const selectFile = (file) => {
     if (!file) {
       setSelectedFile(null);
       setFileError("");
@@ -122,6 +125,19 @@ function DocumentForm({
 
     setSelectedFile(file);
     setFileError(validateUploadFile(file));
+  };
+
+  const handleFileChange = (event) => {
+    selectFile(event.target.files?.[0] || null);
+  };
+
+  const handleFileDrop = (event) => {
+    event.preventDefault();
+    setIsDraggingFile(false);
+
+    if (!isSubmitting) {
+      selectFile(event.dataTransfer.files?.[0] || null);
+    }
   };
 
   const clearSelectedFile = () => {
@@ -142,7 +158,7 @@ function DocumentForm({
 
     if (selectedFile && !isEditing) {
       const uploadData = new FormData();
-      uploadData.append("title", formData.title.trim());
+      uploadData.append("title", selectedFile.name);
       uploadData.append("subject", formData.subject);
       uploadData.append("description", formData.description.trim());
       uploadData.append("file", selectedFile);
@@ -151,7 +167,7 @@ function DocumentForm({
     }
 
     onSubmit({
-      title: formData.title.trim(),
+      title: isEditing ? formData.title.trim() : formData.fileName.trim(),
       subject: formData.subject,
       fileName: formData.fileName.trim(),
       fileType: formData.fileType,
@@ -160,58 +176,73 @@ function DocumentForm({
   };
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="mb-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-          {isEditing ? "Chỉnh sửa tài liệu" : "Thêm tài liệu"}
-        </p>
-        <h2 className="mt-2 text-lg font-semibold tracking-tight text-slate-900">
-          {isEditing
-            ? "Cập nhật thông tin tài liệu"
-            : "Tải file hoặc lưu metadata tài liệu"}
-        </h2>
+    <section className="rounded-[2rem] border border-blue-100 bg-white p-5 sm:p-7">
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-blue-50 text-[#4f8edc]">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-5">
+              <path d="M6 3h8l4 4v14H6z" />
+              <path d="M14 3v5h5M9 13h6M9 17h6" />
+            </svg>
+          </span>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-500">
+              {isEditing ? "Chỉnh sửa tài liệu" : "Tài liệu mới"}
+            </p>
+            <h2 className="mt-1 text-xl font-bold tracking-tight text-slate-900">
+              {isEditing
+                ? "Cập nhật thông tin tài liệu"
+                : "Tải file hoặc lưu metadata"}
+            </h2>
+          </div>
+        </div>
+        <button
+          type="button"
+          aria-label="Đóng form"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          className="grid size-10 shrink-0 place-items-center rounded-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:cursor-not-allowed"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" className="size-5">
+            <path d="m6 6 12 12M18 6 6 18" />
+          </svg>
+        </button>
       </div>
 
       {subjects.length === 0 && !isEditing ? (
-        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+        <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700">
           Cần có ít nhất một môn học trước khi thêm tài liệu.
         </div>
       ) : null}
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div>
-            <label
-              htmlFor="document-title"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              Tên tài liệu
+      <form className="space-y-5" onSubmit={handleSubmit}>
+        <div className={`grid gap-5 ${isEditing ? "sm:grid-cols-2" : ""}`}>
+          {isEditing ? (
+            <label className="block" htmlFor="document-title">
+              <span className="mb-2 block text-sm font-semibold text-slate-700">Tên tài liệu</span>
+              <input
+                id="document-title"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                disabled={isSubmitting}
+                required
+                placeholder="Slide React cơ bản"
+                className={inputClassName}
+              />
             </label>
-            <input
-              id="document-title"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              disabled={isSubmitting}
-              placeholder="Slide React cơ bản"
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100 disabled:cursor-not-allowed disabled:bg-slate-100"
-            />
-          </div>
+          ) : null}
 
-          <div>
-            <label
-              htmlFor="document-subject"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              Môn học
-            </label>
+          <label className="block" htmlFor="document-subject">
+            <span className="mb-2 block text-sm font-semibold text-slate-700">Môn học</span>
             <select
               id="document-subject"
               name="subject"
               value={formData.subject}
               onChange={handleChange}
               disabled={isSubmitting}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+              required
+              className={inputClassName}
             >
               <option value="">Chọn môn học</option>
               {!selectedSubjectExists && formData.subject ? (
@@ -225,55 +256,76 @@ function DocumentForm({
                 </option>
               ))}
             </select>
-          </div>
+          </label>
         </div>
 
         {!isEditing ? (
           <div>
+            <span className="mb-2 block text-sm font-semibold text-slate-700">File tài liệu</span>
             <label
               htmlFor="document-file"
-              className="mb-2 block text-sm font-medium text-slate-700"
+              onDragEnter={(event) => {
+                event.preventDefault();
+                setIsDraggingFile(true);
+              }}
+              onDragOver={(event) => event.preventDefault()}
+              onDragLeave={() => setIsDraggingFile(false)}
+              onDrop={handleFileDrop}
+              className={`block cursor-pointer rounded-2xl border-2 border-dashed px-5 py-7 text-center transition ${
+                isDraggingFile
+                  ? "border-[#4f8edc] bg-blue-100/70"
+                  : selectedFile
+                    ? "border-emerald-200 bg-emerald-50/60"
+                    : "border-blue-200 bg-[#f7fbff] hover:border-[#79b8f3] hover:bg-blue-50"
+              } ${isSubmitting ? "pointer-events-none opacity-60" : ""}`}
             >
-              File tài liệu
+              <input
+                ref={fileInputRef}
+                id="document-file"
+                name="file"
+                type="file"
+                accept={FILE_ACCEPT_VALUE}
+                onChange={handleFileChange}
+                disabled={isSubmitting}
+                className="sr-only"
+              />
+
+              {selectedFile ? (
+                <div className="flex flex-col items-center">
+                  <span className="grid size-12 place-items-center rounded-2xl bg-white text-emerald-600 shadow-sm">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-5">
+                      <path d="m5 12 4 4L19 6" />
+                    </svg>
+                  </span>
+                  <p className="mt-3 max-w-full truncate text-sm font-bold text-slate-800">{selectedFile.name}</p>
+                  <p className="mt-1 text-xs font-medium text-slate-500">{formatFileSize(selectedFile.size)}</p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center">
+                  <span className="grid size-12 place-items-center rounded-2xl bg-white text-[#4f8edc] shadow-sm">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-6">
+                      <path d="M12 16V4M7 9l5-5 5 5M5 14v6h14v-6" />
+                    </svg>
+                  </span>
+                  <p className="mt-3 text-sm font-bold text-slate-700">Kéo thả file vào đây hoặc nhấn để chọn</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-500">PDF, Word, PowerPoint hoặc ảnh · Tối đa 10MB</p>
+                </div>
+              )}
             </label>
-            <input
-              ref={fileInputRef}
-              id="document-file"
-              name="file"
-              type="file"
-              accept={FILE_ACCEPT_VALUE}
-              onChange={handleFileChange}
-              disabled={isSubmitting}
-              className="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-600 outline-none transition file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-800 focus:border-slate-900 focus:ring-4 focus:ring-slate-100 disabled:cursor-not-allowed disabled:bg-slate-100"
-            />
-            <p className="mt-2 text-xs leading-5 text-slate-500">
-              Tối đa 10MB. Hỗ trợ PDF, Word, PowerPoint và ảnh cơ bản. Bỏ
-              trống để chỉ lưu metadata.
-            </p>
 
             {selectedFile ? (
-              <div className="mt-3 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-slate-900">
-                    {selectedFile.name}
-                  </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    {formatFileSize(selectedFile.size)}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={clearSelectedFile}
-                  disabled={isSubmitting}
-                  className="w-fit rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  Bỏ chọn file
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={clearSelectedFile}
+                disabled={isSubmitting}
+                className="mt-3 text-sm font-bold text-rose-600 transition hover:text-rose-700 disabled:opacity-60"
+              >
+                Bỏ file đã chọn
+              </button>
             ) : null}
 
             {fileError ? (
-              <p role="alert" className="mt-2 text-sm font-medium text-rose-600">
+              <p role="alert" className="mt-2 text-sm font-semibold text-rose-600">
                 {fileError}
               </p>
             ) : null}
@@ -281,39 +333,30 @@ function DocumentForm({
         ) : null}
 
         {!selectedFile ? (
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div>
-              <label
-                htmlFor="document-file-name"
-                className="mb-2 block text-sm font-medium text-slate-700"
-              >
-                Tên file metadata
-              </label>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <label className="block" htmlFor="document-file-name">
+              <span className="mb-2 block text-sm font-semibold text-slate-700">Tên file metadata</span>
               <input
                 id="document-file-name"
                 name="fileName"
                 value={formData.fileName}
                 onChange={handleChange}
                 disabled={isSubmitting}
+                required
                 placeholder="react-basic.pdf"
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+                className={inputClassName}
               />
-            </div>
+            </label>
 
-            <div>
-              <label
-                htmlFor="document-type"
-                className="mb-2 block text-sm font-medium text-slate-700"
-              >
-                Loại tài liệu
-              </label>
+            <label className="block" htmlFor="document-type">
+              <span className="mb-2 block text-sm font-semibold text-slate-700">Loại tài liệu</span>
               <select
                 id="document-type"
                 name="fileType"
                 value={formData.fileType}
                 onChange={handleChange}
                 disabled={isSubmitting}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+                className={inputClassName}
               >
                 {DOCUMENT_TYPE_OPTIONS.map((type) => (
                   <option key={type} value={type}>
@@ -321,17 +364,12 @@ function DocumentForm({
                   </option>
                 ))}
               </select>
-            </div>
+            </label>
           </div>
         ) : null}
 
-        <div>
-          <label
-            htmlFor="document-description"
-            className="mb-2 block text-sm font-medium text-slate-700"
-          >
-            Mô tả
-          </label>
+        <label className="block" htmlFor="document-description">
+          <span className="mb-2 block text-sm font-semibold text-slate-700">Mô tả</span>
           <textarea
             id="document-description"
             name="description"
@@ -339,46 +377,43 @@ function DocumentForm({
             value={formData.description}
             onChange={handleChange}
             disabled={isSubmitting}
-            placeholder="Tài liệu học React"
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+            placeholder="Nội dung chính của tài liệu..."
+            className={`${inputClassName} resize-y`}
           />
+        </label>
+
+        <div className="flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50/70 px-4 py-3.5 text-sm text-blue-700">
+          <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-white font-black shadow-sm">i</span>
+          <p className="pt-0.5 leading-5">
+            {isEditing
+              ? "Trang sửa chỉ cập nhật metadata và giữ nguyên file đã upload."
+              : selectedFile
+                ? `Tên tài liệu sẽ tự động lấy theo tên file: ${selectedFile.name}`
+                : "Chưa chọn file thật: tên tài liệu sẽ lấy từ tên file metadata."}
+          </p>
         </div>
 
-        <div className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-700">
-          {isEditing
-            ? "Trang sửa hiện cập nhật metadata và giữ nguyên file đã upload."
-            : selectedFile
-              ? "File sẽ được tải lên máy chủ khi bạn gửi form."
-              : "Chưa chọn file thật: hệ thống sẽ chỉ lưu tên và loại tài liệu."}
-        </div>
-
-        <div className="flex gap-3">
+        <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-50 disabled:opacity-60"
+          >
+            Hủy
+          </button>
           <button
             type="submit"
             disabled={!isFormValid || isSubmitting}
-            className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-slate-900"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#4f8edc] px-5 py-3 text-sm font-bold text-white shadow-md shadow-blue-500/20 transition hover:bg-[#4383ce] disabled:cursor-not-allowed disabled:bg-slate-400 disabled:shadow-none"
           >
-            {isSubmitting
-              ? selectedFile
-                ? "Đang tải lên..."
-                : "Đang lưu..."
-              : isEditing
-                ? "Lưu thay đổi"
-                : selectedFile
-                  ? "Tải tài liệu lên"
-                  : "Thêm tài liệu"}
+            {isSubmitting ? (
+              <>
+                <span className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                {selectedFile ? "Đang tải lên..." : "Đang lưu..."}
+              </>
+            ) : isEditing ? "Lưu thay đổi" : selectedFile ? "Tải tài liệu lên" : "Thêm tài liệu"}
           </button>
-
-          {onCancel ? (
-            <button
-              type="button"
-              onClick={onCancel}
-              disabled={isSubmitting}
-              className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isEditing ? "Hủy" : "Đóng"}
-            </button>
-          ) : null}
         </div>
       </form>
     </section>
