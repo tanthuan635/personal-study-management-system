@@ -8,6 +8,12 @@ export function getDocumentById(id) {
   return apiClient.get(`/documents/${id}`);
 }
 
+export function getDocumentPreview(id) {
+  return apiClient.get(`/documents/${id}/preview`, {
+    responseType: "blob",
+  });
+}
+
 export function createDocument(documentData) {
   return apiClient.post("/documents", documentData);
 }
@@ -29,26 +35,11 @@ export function getDocumentFileUrl(fileUrl) {
     const browserOrigin =
       typeof window !== "undefined"
         ? window.location.origin
-        : "http://localhost:5000";
+        : "http://localhost:5050";
     const apiUrl = new URL(apiClient.defaults.baseURL, browserOrigin);
 
     return new URL(fileUrl, apiUrl.origin).toString();
   } catch {
     return fileUrl;
   }
-}
-
-export async function downloadDocumentFile(fileUrl, fileName) {
-  const response = await apiClient.get(getDocumentFileUrl(fileUrl), {
-    responseType: "blob",
-  });
-  const objectUrl = URL.createObjectURL(response.data);
-  const downloadLink = document.createElement("a");
-
-  downloadLink.href = objectUrl;
-  downloadLink.download = fileName || "tai-lieu";
-  document.body.appendChild(downloadLink);
-  downloadLink.click();
-  downloadLink.remove();
-  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
 }

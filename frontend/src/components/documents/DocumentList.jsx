@@ -16,23 +16,29 @@ function DocumentList({
 
   if (documents.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center">
-        <p className="text-base font-medium text-slate-700">
+      <div className="rounded-[2rem] border border-dashed border-blue-200 bg-blue-50/40 px-6 py-14 text-center">
+        <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-white text-[#4f8edc] shadow-sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="size-6">
+            <path d="M6 3h8l4 4v14H6z" />
+            <path d="M14 3v5h5M9 13h6M9 17h4" />
+          </svg>
+        </span>
+        <p className="mt-4 text-base font-bold text-slate-700">
           {hasActiveFilters
-            ? "Không tìm thấy tài liệu phù hợp."
-            : "Chưa có tài liệu nào."}
+            ? "Không tìm thấy tài liệu phù hợp"
+            : "Chưa có tài liệu nào"}
         </p>
         <p className="mt-2 text-sm text-slate-500">
           {hasActiveFilters
-            ? "Hãy đổi từ khóa hoặc bộ lọc môn học."
-            : "Nhấn nút Thêm tài liệu để lưu tài liệu đầu tiên."}
+            ? "Hãy đổi từ khóa, môn học hoặc xóa bộ lọc."
+            : "Nhấn Thêm tài liệu để tạo tài liệu đầu tiên."}
         </p>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {documents.map((documentItem) => (
         <DocumentCard
           key={documentItem._id}

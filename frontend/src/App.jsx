@@ -6,36 +6,26 @@ import AuthLayout from "./layouts/login/AuthLayout";
 import MainLayout from "./layouts/MainLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Documents from "./pages/Documents";
+import DocumentViewer from "./pages/DocumentViewer";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Schedule from "./pages/Schedule";
 import Statistics from "./pages/Statistics";
 import Subjects from "./pages/Subjects";
 import Tasks from "./pages/Tasks";
-import { isAuthenticated } from "./lib/auth";
-
-function HomeRedirect() {
-  return isAuthenticated() ? (
-    <Navigate to="/dashboard" replace />
-  ) : (
-    <Navigate to="/login" replace />
-  );
-}
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomeRedirect />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
 
         <Route
           path="/login"
           element={
-            <GuestOnlyRoute>
-              <AuthLayout>
-                <Login />
-              </AuthLayout>
-            </GuestOnlyRoute>
+            <AuthLayout>
+              <Login />
+            </AuthLayout>
           }
         />
         <Route
@@ -95,6 +85,16 @@ function App() {
             <RequireAuth>
               <MainLayout>
                 <Documents />
+              </MainLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/documents/:id/view"
+          element={
+            <RequireAuth>
+              <MainLayout>
+                <DocumentViewer />
               </MainLayout>
             </RequireAuth>
           }

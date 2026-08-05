@@ -24,6 +24,9 @@ function getFormValue(initialSubject) {
   };
 }
 
+const inputClassName =
+  "w-full rounded-2xl border border-blue-100 bg-[#f7fbff] px-4 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-blue-200 focus:border-[#79b8f3] focus:bg-white focus:ring-4 focus:ring-blue-100/70 disabled:cursor-not-allowed disabled:bg-slate-100";
+
 function SubjectForm({
   mode = "add",
   initialSubject,
@@ -61,89 +64,116 @@ function SubjectForm({
   };
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="mb-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-          {isEditing ? "Chỉnh sửa môn học" : "Thêm môn học"}
-        </p>
-        <h2 className="mt-2 text-lg font-semibold tracking-tight text-slate-900">
-          {isEditing ? "Cập nhật thông tin môn học" : "Tạo môn học mới"}
-        </h2>
+    <section className="border border-blue-100 bg-white p-5 sm:p-7">
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-blue-50 text-lg font-black text-[#4f8edc]">
+            {isEditing ? "S" : "+"}
+          </span>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-500">
+              {isEditing ? "Chỉnh sửa môn học" : "Môn học mới"}
+            </p>
+            <h2 className="mt-1 text-xl font-bold tracking-tight text-slate-900">
+              {isEditing ? "Cập nhật thông tin" : "Thêm thông tin môn học"}
+            </h2>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          aria-label="Đóng form"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          className="grid size-10 shrink-0 place-items-center rounded-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:cursor-not-allowed"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            aria-hidden="true"
+            className="size-5"
+          >
+            <path d="m6 6 12 12M18 6 6 18" />
+          </svg>
+        </button>
       </div>
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="subject-name" className="mb-2 block text-sm font-medium text-slate-700">
-            Tên môn học
+      <form className="space-y-5" onSubmit={handleSubmit}>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <label className="block" htmlFor="subject-name">
+            <span className="mb-2 block text-sm font-semibold text-slate-700">
+              Tên môn học
+            </span>
+            <input
+              id="subject-name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              required
+              placeholder="Lập trình Web"
+              className={inputClassName}
+            />
           </label>
-          <input
-            id="subject-name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            disabled={isSubmitting}
-            placeholder="Lập trình Web"
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
-          />
+
+          <label className="block" htmlFor="subject-code">
+            <span className="mb-2 block text-sm font-semibold text-slate-700">
+              Mã môn
+            </span>
+            <input
+              id="subject-code"
+              name="code"
+              value={formData.code}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              required
+              placeholder="WEB101"
+              className={inputClassName}
+            />
+          </label>
+
+          <label className="block" htmlFor="subject-teacher">
+            <span className="mb-2 block text-sm font-semibold text-slate-700">
+              Giảng viên
+            </span>
+            <input
+              id="subject-teacher"
+              name="teacher"
+              value={formData.teacher}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              required
+              placeholder="Nguyễn Văn A"
+              className={inputClassName}
+            />
+          </label>
+
+          <label className="block" htmlFor="subject-credits">
+            <span className="mb-2 block text-sm font-semibold text-slate-700">
+              Số tín chỉ
+            </span>
+            <input
+              id="subject-credits"
+              name="credits"
+              type="number"
+              min="1"
+              value={formData.credits}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              required
+              placeholder="3"
+              className={inputClassName}
+            />
+          </label>
         </div>
 
-        <div>
-          <label htmlFor="subject-code" className="mb-2 block text-sm font-medium text-slate-700">
-            Mã môn
-          </label>
-          <input
-            id="subject-code"
-            name="code"
-            value={formData.code}
-            onChange={handleChange}
-            disabled={isSubmitting}
-            placeholder="WEB101"
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="subject-teacher"
-            className="mb-2 block text-sm font-medium text-slate-700"
-          >
-            Giảng viên
-          </label>
-          <input
-            id="subject-teacher"
-            name="teacher"
-            value={formData.teacher}
-            onChange={handleChange}
-            disabled={isSubmitting}
-            placeholder="Nguyễn Văn A"
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="subject-credits" className="mb-2 block text-sm font-medium text-slate-700">
-            Số tín chỉ
-          </label>
-          <input
-            id="subject-credits"
-            name="credits"
-            type="number"
-            min="1"
-            value={formData.credits}
-            onChange={handleChange}
-            disabled={isSubmitting}
-            placeholder="3"
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="subject-description"
-            className="mb-2 block text-sm font-medium text-slate-700"
-          >
+        <label className="block" htmlFor="subject-description">
+          <span className="mb-2 block text-sm font-semibold text-slate-700">
             Mô tả
-          </label>
+          </span>
           <textarea
             id="subject-description"
             name="description"
@@ -152,33 +182,35 @@ function SubjectForm({
             onChange={handleChange}
             disabled={isSubmitting}
             placeholder="Môn học về lập trình giao diện web"
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-4 focus:ring-slate-100"
+            className={`${inputClassName} resize-y`}
           />
-        </div>
+        </label>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Hủy
+          </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#4f8edc] px-5 py-3 text-sm font-bold text-white shadow-md shadow-blue-500/20 transition hover:bg-[#4383ce] disabled:cursor-not-allowed disabled:bg-slate-400 disabled:shadow-none"
           >
-            {isSubmitting
-              ? "Đang lưu..."
-              : isEditing
-                ? "Lưu thay đổi"
-                : "Thêm môn học"}
+            {isSubmitting ? (
+              <>
+                <span className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                Đang lưu...
+              </>
+            ) : isEditing ? (
+              "Lưu thay đổi"
+            ) : (
+              "Thêm môn học"
+            )}
           </button>
-
-          {onCancel ? (
-            <button
-              type="button"
-              onClick={onCancel}
-              disabled={isSubmitting}
-              className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isEditing ? "Hủy" : "Đóng"}
-            </button>
-          ) : null}
         </div>
       </form>
     </section>

@@ -2,7 +2,7 @@
 
 ## 1. Thông tin chung
 
-- Base URL mặc định: `http://localhost:5000/api`
+- Base URL mặc định: `http://localhost:5050/api`
 - Frontend cấu hình qua biến môi trường `VITE_API_URL`.
 - Request JSON sử dụng header `Content-Type: application/json`.
 - Các API nghiệp vụ yêu cầu JWT:
@@ -256,7 +256,7 @@ Field file phải có tên `file`. Các field text gồm `title`, `subject` và
 `description`. Khi có file, server tự tạo `fileName`, `fileUrl` và `fileType`.
 
 ```bash
-curl -X POST http://localhost:5000/api/documents \
+curl -X POST http://localhost:5050/api/documents \
   -H "Authorization: Bearer <token>" \
   -F "title=Slide React" \
   -F "subject=<subject_id>" \
@@ -268,7 +268,7 @@ curl -X POST http://localhost:5000/api/documents \
 - Định dạng: PDF, DOC, DOCX, PPT, PPTX, JPG, JPEG, PNG, GIF, WEBP.
 - File được lưu trong `backend/uploads`.
 - URL file có dạng `/uploads/<stored_file_name>`.
-- Mở file bằng `http://localhost:5000<fileUrl>`.
+- Mở file bằng `http://localhost:5050<fileUrl>`.
 - Static URL `/uploads` hiện không yêu cầu JWT.
 - `PUT /api/documents/:id` hiện chỉ cập nhật metadata, chưa thay file.
 
