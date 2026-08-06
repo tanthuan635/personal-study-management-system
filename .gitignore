@@ -1,7 +1,70 @@
-node_modules
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment variables and local secrets
 .env
-dist
-build
-.vscode
-.DS_Store
+.env.*
+!.env.example
+!**/.env.example
+.npmrc
+*.pem
+*.key
+*.crt
+*.pfx
+*.p12
+
+# Build outputs and caches
+dist/
+**/dist/
+dist-ssr/
+**/dist-ssr/
+build/
+**/build/
+coverage/
+**/coverage/
+.nyc_output/
+.vite/
+**/.vite/
+.cache/
+**/.cache/
+.eslintcache
+*.tsbuildinfo
+
+# Logs and runtime files
+logs/
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.pid
+*.pid.lock
+
+# Uploaded files and local databases
 backend/uploads/
+*.db
+*.sqlite
+*.sqlite3
+
+# Local editor and assistant settings
+.vscode/
+.idea/
+.agents/
+.codex/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Operating system and temporary files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.temp
+*.bak
+*~
