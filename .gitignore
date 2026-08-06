@@ -45,6 +45,7 @@ lerna-debug.log*
 
 # Uploaded files and local databases
 backend/uploads/
+/docx/
 *.db
 *.sqlite
 *.sqlite3
