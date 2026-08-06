@@ -7,7 +7,9 @@ import MainLayout from "./layouts/MainLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Documents from "./pages/Documents";
 import DocumentViewer from "./pages/DocumentViewer";
+import Landing from "./pages/Landing";
 import Login from "./pages/auth/Login";
+import Privacy from "./pages/Privacy";
 import Register from "./pages/auth/Register";
 import Schedule from "./pages/Schedule";
 import Statistics from "./pages/Statistics";
@@ -18,7 +20,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/privacy" element={<Privacy />} />
 
         <Route
           path="/login"
