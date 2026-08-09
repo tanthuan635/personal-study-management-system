@@ -90,6 +90,13 @@ node --check src/server.js
 npm run dev
 ```
 
+## Deploy frontend lên Vercel
+
+Trong Vercel Project Settings, đặt **Root Directory** là `frontend`. File
+`frontend/vercel.json` sẽ dùng `npm run build`, lấy kết quả từ thư mục `dist`
+và chuyển các URL của React Router về `index.html`. Không đặt Output Directory
+thành `A` trong Project Settings.
+
 ## Tài liệu
 
 - [API](docs/API.md)
