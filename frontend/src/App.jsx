@@ -7,6 +7,7 @@ import MainLayout from "./layouts/MainLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Documents from "./pages/Documents";
 import DocumentViewer from "./pages/DocumentViewer";
+import Features from "./pages/Features";
 import Landing from "./pages/Landing";
 import Login from "./pages/auth/Login";
 import Privacy from "./pages/Privacy";
@@ -21,6 +22,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/features" element={<Features />} />
         <Route path="/privacy" element={<Privacy />} />
 
         <Route

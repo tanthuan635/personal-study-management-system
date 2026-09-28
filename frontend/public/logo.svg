@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 110" role="img" aria-labelledby="title desc">
+  <title id="title">Study Manager icon</title>
+  <desc id="desc">Open study notebook with a checklist and a completed check mark.</desc>
+  <path d="M60 27C43 17 23 18 10 25v59c14-7 33-6 50 4 17-10 36-11 50-4V25C97 18 77 17 60 27Z" fill="#F7FBFF" stroke="#4F8EDC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M60 28v59" fill="none" stroke="#4F8EDC" stroke-width="4" stroke-linecap="round"/>
+  <g fill="#23446B">
+    <circle cx="22" cy="42" r="3"/>
+    <circle cx="22" cy="56" r="3"/>
+    <circle cx="22" cy="70" r="3"/>
+  </g>
+  <g fill="none" stroke="#23446B" stroke-width="4" stroke-linecap="round">
+    <path d="M31 42h17"/>
+    <path d="M31 56h17"/>
+    <path d="M31 70h17"/>
+  </g>
+  <path d="m72 56 8 8 17-20" fill="none" stroke="#24A994" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,16 +1,18 @@
+import { Link } from "react-router-dom";
 import heroImage from "../../assets/hero.png";
 
 function BrandMark() {
   return (
-    <div className="flex items-center gap-3">
-      <span className="grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-[#79b8f3] to-[#4f8edc] text-sm font-black tracking-tight text-white shadow-lg shadow-blue-900/15">
-        SM
-      </span>
+    <Link
+      to="/"
+      className="inline-flex w-fit items-center gap-3 rounded-2xl border border-white/80 bg-white/45 px-4 py-3 shadow-sm shadow-blue-200/30 backdrop-blur transition hover:border-blue-200 hover:bg-white/75 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
+    >
+      <img src="/logo.svg" alt="" className="size-11 shrink-0 object-contain" />
       <div>
         <p className="brand-name text-lg text-[#183b5b]">Study Manager</p>
         <p className="text-xs text-slate-500">Quản lý học tập thông minh</p>
       </div>
-    </div>
+    </Link>
   );
 }
 

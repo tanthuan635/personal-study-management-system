@@ -145,9 +145,11 @@ function Sidebar({
       >
         <div className="flex items-center justify-between gap-3 px-2 lg:px-1.5">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#79b8f3] to-[#4f8edc] text-sm font-black text-white shadow-md shadow-blue-500/20">
-              SM
-            </span>
+            <img
+              src="/logo.svg"
+              alt=""
+              className="size-11 shrink-0 object-contain"
+            />
             <div
               className={`sidebar-collapse-text min-w-0 overflow-hidden whitespace-nowrap ${
                 isCollapsed ? "lg:max-w-0" : "lg:max-w-48"

@@ -35,9 +35,7 @@ function ProductPreview() {
         <div className="grid min-h-[370px] grid-cols-[58px_1fr] sm:grid-cols-[132px_1fr]">
           <aside className="border-r border-blue-100 bg-[#fafdff] p-2.5 sm:p-3">
             <div className="mb-5 flex items-center gap-2 px-1">
-              <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[#4f8edc] text-[9px] font-black text-white">
-                SM
-              </span>
+              <img src="/logo.svg" alt="" className="size-8 shrink-0 object-contain" />
               <span className="hidden text-[10px] font-black text-[#183b5b] sm:block">
                 Study Manager
               </span>

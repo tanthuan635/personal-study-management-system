@@ -42,9 +42,7 @@ function Privacy() {
             to="/"
             className="flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
           >
-            <span className="grid size-10 place-items-center rounded-xl bg-[#4f8edc] text-xs font-black text-white">
-              SM
-            </span>
+            <img src="/logo.svg" alt="" className="size-10 shrink-0 object-contain" />
             <span className="brand-name text-base text-[#183b5b]">Study Manager</span>
           </Link>
           <Link
