@@ -6,9 +6,13 @@
     "dev:frontend": "npm --prefix frontend run dev",
     "build": "npm --prefix frontend run build",
     "lint": "npm --prefix frontend run lint",
-    "preview": "npm --prefix frontend run preview"
+    "preview": "npm --prefix frontend run preview",
+    "demo:assets": "node scripts/demo/generate-assets.mjs",
+    "demo:seed": "node backend/scripts/seed-demo.js",
+    "demo:screenshots": "node scripts/demo/capture-screenshots.mjs"
   },
   "devDependencies": {
-    "concurrently": "^10.0.4"
+    "concurrently": "^10.0.4",
+    "playwright": "^1.65.1"
   }
 }

@@ -69,3 +69,6 @@ Desktop.ini
 *.temp
 *.bak
 *~
+
+# Ảnh demo cho portfolio (tạo bằng scripts/demo/capture-screenshots.mjs)
+demo-screenshots/
