@@ -171,6 +171,43 @@ function DocumentsPreview() {
   );
 }
 
+function StatisticsPreview() {
+  return (
+    <>
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-blue-100 bg-[linear-gradient(120deg,#ddecff_0%,#eef7ff_60%,#ffffff_100%)] p-4 sm:p-5">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#3979c2]">Báo cáo học tập</p>
+          <p className="mt-2 text-xl font-bold tracking-tight text-slate-950">Thống kê tiến độ</p>
+        </div>
+        <div className="min-w-[140px] rounded-xl border border-white/80 bg-white/70 p-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Hoàn thành</p>
+          <p className="mt-1 text-xl font-black text-[#4f8edc]">63%</p>
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-blue-100"><div className="h-full w-[63%] rounded-full bg-[#4f8edc]" /></div>
+        </div>
+      </div>
+      <PreviewStats items={[["Tổng môn học", 3], ["Tổng deadline", 8], ["Đã hoàn thành", 5], ["Chưa hoàn thành", 3]]} />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl border border-blue-100 bg-white p-4">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#3979c2]">Phân bổ trạng thái</p>
+          <p className="mt-2 text-sm font-bold text-slate-900">Deadline đã xử lý và còn lại</p>
+          <div className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-amber-100"><div className="h-full w-[63%] bg-emerald-400" /></div>
+          <div className="mt-3 flex justify-between gap-2 text-xs font-semibold"><span className="text-emerald-700">5 đã hoàn thành</span><span className="text-amber-700">3 chưa hoàn thành</span></div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-2xl border border-rose-100 bg-rose-50/60 p-4">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-rose-500">Quá hạn</p>
+            <p className="mt-2 text-2xl font-black text-rose-700">1</p>
+          </div>
+          <div className="rounded-2xl border border-amber-100 bg-amber-50/60 p-4">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-600">7 ngày tới</p>
+            <p className="mt-2 text-2xl font-black text-amber-700">2</p>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
 function ProductTourPreview({ screen, title }) {
   if (screen === "overview" || screen === "dashboard") return <DashboardMockup />;
 
@@ -197,6 +234,7 @@ function ProductTourPreview({ screen, title }) {
             {screen === "tasks" && <TasksPreview />}
             {screen === "schedule" && <SchedulePreview />}
             {screen === "documents" && <DocumentsPreview />}
+            {screen === "statistics" && <StatisticsPreview />}
           </div>
         </div>
       </div>

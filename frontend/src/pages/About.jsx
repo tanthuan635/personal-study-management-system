@@ -65,6 +65,16 @@ const tourSections = [
       "Chọn Mở file trên tài liệu đã tải lên để xem trong trang riêng; Sửa để cập nhật thông tin.",
     ],
   },
+  {
+    id: "statistics", title: "Thống kê",
+    headline: "Đánh giá tiến độ bằng số liệu.",
+    description: "Trang Thống kê tổng hợp từ các môn học và deadline bạn đã lưu: tỷ lệ hoàn thành, số deadline đã xử lý và còn lại, cùng các hạn nộp đã quá hạn hoặc sắp đến trong 7 ngày tới.",
+    details: [
+      "Xem tổng số môn học, tổng deadline, số đã hoàn thành và chưa hoàn thành.",
+      "Theo dõi thanh tiến độ tổng thể kèm lời nhắc thay đổi theo tỷ lệ hoàn thành.",
+      "Kiểm tra số deadline quá hạn và đến hạn trong 7 ngày tới để ưu tiên việc cần làm trước.",
+    ],
+  },
 ];
 
 function About() {
@@ -101,8 +111,8 @@ function About() {
           <p className="mt-2 text-sm leading-6 text-slate-600">Quản lý môn học, deadline, lịch và tài liệu. Chọn một khu vực để khám phá cách dùng.</p>
         </header>
 
-        <div className="grid min-h-0 min-w-0 gap-4 lg:grid-cols-[176px_minmax(0,1fr)]">
-          <aside aria-label="Mục lục tham quan" className="min-h-0 rounded-2xl border border-blue-100 bg-[#fafdff] p-2 lg:overflow-y-auto">
+        <div className="grid min-h-0 min-w-0 grid-cols-1 gap-4 lg:grid-cols-[176px_minmax(0,1fr)]">
+          <aside aria-label="Mục lục tham quan" className="min-h-0 min-w-0 rounded-2xl border border-blue-100 bg-[#fafdff] p-2 lg:overflow-y-auto">
             <p className="hidden px-3 pb-3 pt-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 lg:block">Khám phá giao diện</p>
             <nav ref={navigationRef} aria-label="Các khu vực Study Manager" className="flex gap-1 overflow-x-auto lg:flex-col">
               {tourSections.map((section, index) => (
