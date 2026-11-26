@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import GuestOnlyRoute from "./components/auth/GuestOnlyRoute";
 import RequireAuth from "./components/auth/RequireAuth";
@@ -11,6 +11,7 @@ import DocumentViewer from "./pages/DocumentViewer";
 import Features from "./pages/Features";
 import Landing from "./pages/Landing";
 import Login from "./pages/auth/Login";
+import NotFound from "./pages/NotFound";
 import Privacy from "./pages/Privacy";
 import Register from "./pages/auth/Register";
 import Schedule from "./pages/Schedule";
@@ -117,7 +118,7 @@ function App() {
           }
         />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
