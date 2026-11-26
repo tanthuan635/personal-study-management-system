@@ -1,6 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 const currentYear = new Date().getFullYear();
+
+const exploreLinks = [
+  { label: "Trang chủ", to: "/" },
+  { label: "Tính năng", to: "/features" },
+  { label: "Chi tiết về web", to: "/about" },
+  { label: "Quyền riêng tư", to: "/privacy" },
+];
 
 function LandingFooter() {
   return (
@@ -24,26 +31,22 @@ function LandingFooter() {
           <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
             Khám phá
           </p>
-          <div className="mt-4 space-y-3 text-sm font-semibold text-slate-600">
-            <Link
-              className="block rounded-sm hover:text-[#3979c2] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
-              to="/features"
-            >
-              Tính năng
-            </Link>
-            <Link
-              className="block rounded-sm hover:text-[#3979c2] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
-              to="/#workflow"
-            >
-              Cách hoạt động
-            </Link>
-            <Link
-              className="block rounded-sm hover:text-[#3979c2] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
-              to="/privacy"
-            >
-              Quyền riêng tư
-            </Link>
-          </div>
+          <nav aria-label="Khám phá" className="mt-4 space-y-3 text-sm font-semibold">
+            {exploreLinks.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === "/"}
+                className={({ isActive }) =>
+                  `block rounded-sm hover:text-[#3979c2] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 ${
+                    isActive ? "text-[#2f689f] underline underline-offset-4" : "text-slate-600"
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
         </div>
 
         <div>

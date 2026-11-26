@@ -4,6 +4,7 @@ import GuestOnlyRoute from "./components/auth/GuestOnlyRoute";
 import RequireAuth from "./components/auth/RequireAuth";
 import AuthLayout from "./layouts/login/AuthLayout";
 import MainLayout from "./layouts/MainLayout";
+import About from "./pages/About";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Documents from "./pages/Documents";
 import DocumentViewer from "./pages/DocumentViewer";
@@ -23,6 +24,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/features" element={<Features />} />
+        <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
 
         <Route

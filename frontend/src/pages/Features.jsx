@@ -9,7 +9,7 @@ const features = [
     eyebrow: "Tổng quan",
     title: "Dashboard và thống kê tiến độ",
     description:
-      "Dashboard và trang Thống kê lấy số liệu từ tài khoản đang đăng nhập để bạn xem tình hình học tập hiện tại.",
+      "Xem tổng quan môn học và tiến độ xử lý deadline để biết phần việc đã xong, phần còn lại và những hạn nộp cần chú ý.",
     details: [
       "Tổng hợp số môn học, deadline, deadline đã hoàn thành và chưa hoàn thành.",
       "Hiển thị tỷ lệ hoàn thành, deadline quá hạn và deadline đến hạn trong 7 ngày tới.",
@@ -20,7 +20,7 @@ const features = [
     eyebrow: "Môn học",
     title: "Quản lý danh sách môn học",
     description:
-      "Tạo và cập nhật thông tin các môn đang học để dùng làm ngữ cảnh cho deadline, lịch học và tài liệu.",
+      "Lưu các môn đang học và liên kết deadline, lịch học, tài liệu với từng môn để dễ tổ chức và tra cứu.",
     details: [
       "Lưu tên môn, mã môn, giảng viên, số tín chỉ và mô tả.",
       "Tìm kiếm môn học theo tên hoặc mã; thêm, sửa và xóa môn học.",
@@ -31,7 +31,7 @@ const features = [
     eyebrow: "Deadline",
     title: "Theo dõi công việc và hạn nộp",
     description:
-      "Ghi lại từng công việc cần hoàn thành, ngày đến hạn và trạng thái xử lý.",
+      "Ghi lại từng công việc, ngày đến hạn và trạng thái xử lý để chọn việc cần ưu tiên và theo dõi đến khi hoàn thành.",
     details: [
       "Gắn deadline với môn học, chọn mức ưu tiên và lưu ghi chú.",
       "Lọc danh sách theo trạng thái hoặc mức ưu tiên; cập nhật trạng thái công việc.",
@@ -42,7 +42,7 @@ const features = [
     eyebrow: "Lịch học",
     title: "Sắp xếp thời khóa biểu trong tuần",
     description:
-      "Lưu các buổi học theo thứ và tiết để xem lịch tuần theo từng môn.",
+      "Xem các buổi học theo thứ và tiết để biết khi nào học môn gì, ở phòng nào và chủ động sắp xếp kế hoạch trong tuần.",
     details: [
       "Ghi môn học, thứ, tiết bắt đầu và kết thúc, phòng học và ghi chú.",
       "Xem các buổi học trong bảng thời khóa biểu và lọc theo môn học.",
@@ -53,7 +53,7 @@ const features = [
     eyebrow: "Tài liệu",
     title: "Lưu tài liệu theo môn học",
     description:
-      "Lưu thông tin tài liệu hoặc tải file lên và gắn tài liệu với môn học tương ứng.",
+      "Lưu thông tin hoặc tải file tài liệu lên theo môn để dễ tìm lại khi làm bài và ôn tập.",
     details: [
       "Tìm tài liệu theo tên, tên file hoặc loại file; lọc danh sách theo môn học.",
       "Tải lên PDF, Word, PowerPoint và ảnh với dung lượng tối đa 10 MB; mở file đã tải trong trang xem tài liệu.",
@@ -74,7 +74,7 @@ function Features() {
   return (
     <LandingLayout>
       <main>
-        <section aria-labelledby="features-title" className="bg-[#fafdff]">
+        <section aria-labelledby="features-title" className="landing-hero bg-[#fafdff]">
           <div className="mx-auto w-full max-w-[1200px] px-5 py-16 sm:px-8 sm:py-20">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-500">
               Tính năng hiện có

@@ -39,6 +39,25 @@ body {
     filter 120ms ease-out;
 }
 
+.landing-shell {
+  --landing-header-height: 73px;
+}
+
+.landing-hero {
+  display: flex;
+  align-items: center;
+  min-height: calc(100vh - var(--landing-header-height));
+  min-height: calc(100dvh - var(--landing-header-height));
+}
+
+@media (min-width: 1024px) {
+  .landing-tour {
+    height: calc(100vh - var(--landing-header-height));
+    height: calc(100dvh - var(--landing-header-height));
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+}
+
 .landing-hero-grid {
   background-image:
     linear-gradient(rgb(79 142 220 / 7%) 1px, transparent 1px),

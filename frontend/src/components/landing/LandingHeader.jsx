@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 const navigationItems = [
   { label: "Trang chủ", to: "/" },
   { label: "Tính năng", to: "/features" },
-  { label: "Cách hoạt động", to: "/#workflow" },
+  { label: "Chi tiết về web", to: "/about" },
 ];
 
 function Brand() {
@@ -34,19 +34,24 @@ function LandingHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-blue-100/80 bg-[#fafdff]/92 backdrop-blur-xl">
-      <div className="mx-auto flex h-[72px] w-full max-w-[1200px] items-center justify-between px-5 sm:px-8">
+      <div className="mx-auto flex h-[calc(var(--landing-header-height)-1px)] w-full max-w-[1200px] items-center justify-between px-5 sm:px-8">
         <Brand />
 
         <nav aria-label="Điều hướng chính" className="hidden items-center gap-1 lg:flex">
           {navigationItems.map((item) => (
-            <Link
+            <NavLink
               key={item.to}
               to={item.to}
+              end={item.to === "/"}
               onClick={closeMenu}
-              className="rounded-lg px-3.5 py-2 text-sm font-semibold text-slate-600 transition hover:bg-blue-50 hover:text-[#3979c2] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
+              className={({ isActive }) =>
+                `rounded-lg px-3.5 py-2 text-sm font-semibold transition hover:bg-blue-50 hover:text-[#3979c2] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 ${
+                  isActive ? "bg-[#e6f2ff] text-[#2f689f]" : "text-slate-600"
+                }`
+              }
             >
               {item.label}
-            </Link>
+            </NavLink>
           ))}
         </nav>
 
@@ -95,22 +100,27 @@ function LandingHeader() {
         id="landing-mobile-menu"
         aria-hidden={!isMenuOpen}
         inert={!isMenuOpen}
-        className={`overflow-hidden border-t border-blue-100 bg-white transition-[max-height,opacity] duration-200 lg:hidden ${
+        className={`overflow-hidden border-blue-100 bg-white transition-[max-height,opacity] duration-200 lg:hidden ${
           isMenuOpen
-            ? "max-h-[520px] opacity-100"
+            ? "max-h-[520px] border-t opacity-100"
             : "pointer-events-none max-h-0 opacity-0"
         }`}
       >
         <nav aria-label="Điều hướng trên điện thoại" className="space-y-1 px-5 py-5 sm:px-8">
           {navigationItems.map((item) => (
-            <Link
+            <NavLink
               key={item.to}
               to={item.to}
+              end={item.to === "/"}
               onClick={closeMenu}
-              className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-[#3979c2] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
+              className={({ isActive }) =>
+                `block rounded-xl px-4 py-3 text-sm font-semibold transition hover:bg-blue-50 hover:text-[#3979c2] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 ${
+                  isActive ? "bg-[#e6f2ff] text-[#2f689f]" : "text-slate-700"
+                }`
+              }
             >
               {item.label}
-            </Link>
+            </NavLink>
           ))}
           <div className="grid grid-cols-2 gap-3 border-t border-blue-100 pt-4">
             <Link
