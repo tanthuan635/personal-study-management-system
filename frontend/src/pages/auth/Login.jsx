@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+import {
+  isServerUnavailableError,
+  SERVER_UNAVAILABLE_MESSAGE,
+} from "../../api/apiClient";
 import { login } from "../../api/authApi";
 import AuthButton from "../../components/auth/AuthButton";
 import AuthInput from "../../components/auth/AuthInput";
@@ -16,8 +20,8 @@ function getLoginErrorMessage(error) {
     return "Email hoặc mật khẩu không đúng.";
   }
 
-  if (!error.response) {
-    return "Không thể kết nối tới máy chủ. Vui lòng thử lại.";
+  if (isServerUnavailableError(error)) {
+    return SERVER_UNAVAILABLE_MESSAGE;
   }
 
   return error.response.data?.message || "Đăng nhập thất bại. Vui lòng thử lại.";

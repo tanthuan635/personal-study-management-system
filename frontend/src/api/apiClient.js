@@ -52,3 +52,14 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
+
+export const SERVER_UNAVAILABLE_MESSAGE =
+  "Máy chủ hiện chưa hoạt động, vui lòng thử lại sau.";
+
+export function isServerUnavailableError(error) {
+  if (!error?.response) {
+    return true;
+  }
+
+  return [502, 503, 504].includes(error.response.status);
+}
